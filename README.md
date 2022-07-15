@@ -6,7 +6,9 @@
 <p>Vepr is a JavaScript library for exploratory data visualization.</p>
 </div>
 
-Vepr implements special protocol that allows declaring complex data visualization while keeping small declaration size and being able to transfer the visualization to different environment (e.g. server → browser, web worker → main thread).
+Vepr implements special protocol that allows declaring complex data visualization while keeping
+small declaration size and being able to transfer the visualization to different environment (e.g.
+server → browser, web worker → main thread).
 
 ## Installing
 
@@ -19,7 +21,7 @@ npm install vepr
 And used as a node module
 
 ```js
-import { plot, dot } from 'vepr'
+import { plot, dot } from "vepr";
 ```
 
 Or accessed via CDNs like unpkg.com right in the browser environment

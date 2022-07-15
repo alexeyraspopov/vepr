@@ -3,5 +3,16 @@
   "version": "0.0.0",
   "description": "Visualization Protocol",
   "author": "Alexey Raspopov",
-  "license": "ISC"
+  "license": "ISC",
+  "repository": "alexeyraspopov/vepr",
+  "scripts": {
+    "build": "rollup --config rollup.config.js"
+  },
+  "devDependencies": {
+    "@rollup/plugin-multi-entry": "^4.1.0",
+    "prettier": "^2.7.1",
+    "rollup": "^2.77.0",
+    "rollup-plugin-bundle-size": "^1.0.3",
+    "rollup-plugin-copy": "^3.4.0"
+  }
 }
