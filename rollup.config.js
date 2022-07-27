@@ -1,12 +1,10 @@
 import copy from "rollup-plugin-copy";
 import size from "rollup-plugin-bundle-size";
-import multi from "@rollup/plugin-multi-entry";
 
 export default {
-  input: ["modules/*.js", "modules/mark/*.js", "modules/transform/*.js"],
+  input: ["modules/index.js"],
   output: { file: "build/vepr.js", format: "esm" },
   plugins: [
-    multi(),
     size(),
     copy({
       targets: [
