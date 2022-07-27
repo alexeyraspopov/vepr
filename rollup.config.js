@@ -1,11 +1,9 @@
 import copy from "rollup-plugin-copy";
-import size from "rollup-plugin-bundle-size";
 
 export default {
   input: ["modules/index.js"],
   output: { file: "build/vepr.js", format: "esm" },
   plugins: [
-    size(),
     copy({
       targets: [
         { src: ["LICENSE", "README.md"], dest: "build" },
@@ -26,13 +24,13 @@ function generatePkg(contents) {
       author: pkg.author,
       homepage: pkg.homepage,
       repository: pkg.repository,
+      type: "module",
       main: "./vepr.js",
       module: "./vepr.js",
       exports: "./vepr.js",
-      type: "module",
-      types: pkg.types,
+      types: "./vepr.d.ts",
+      files: ["*.js", "*.d.ts"],
       sideEffects: false,
-      files: pkg.files,
       keywords: pkg.keywords,
       dependencies: pkg.dependencies,
       peerDependencies: pkg.peerDependencies,
