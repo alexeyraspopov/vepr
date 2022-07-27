@@ -21,8 +21,8 @@ export function barX(data, encodings) {
     ],
     channels: {
       index: Uint16Array.from(data, (_, index) => index),
-      x: Float32Array.from(data, (datum) => ord(datum[encodings.x])),
-      y: Float32Array.from(data, (datum) => cont(datum[encodings.y])),
+      x: Float32Array.from(encodings.values(data, encodings.x), ord),
+      y: Float32Array.from(encodings.values(data, encodings.y), cont),
       fill: [], // can be cont or ord
     },
   };
@@ -49,8 +49,8 @@ export function barY(data, encodings) {
     ],
     channels: {
       index: Uint16Array.from(data, (_, index) => index),
-      x: Float32Array.from(data, (datum) => cont(datum[encodings.x])),
-      y: Float32Array.from(data, (datum) => ord(datum[encodings.y])),
+      x: Float32Array.from(encodings.values(data, encodings.x), cont),
+      y: Float32Array.from(encodings.values(data, encodings.y), ord),
       fill: [], // can be cont or ord
     },
   };
