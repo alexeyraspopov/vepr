@@ -24,10 +24,10 @@ export function plot(root, layers) {
                 target.attr("data-key", pointer);
 
                 let access = new Proxy({}, { get: (_, key) => layer.channels[key][pointer] });
+                let scope = { x, y, d: access };
                 for (let key in shape.attrs) {
-                  let expr = shape.attrs[key];
-                  let fn = new Function("x", "y", "d", "return " + expr);
-                  target.attr(key, fn(x, y, access));
+                  let fn = new Function("scope", "with (scope) return " + shape.attrs[key]);
+                  target.attr(key, fn(scope));
                 }
 
                 return target.node();
