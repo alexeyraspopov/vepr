@@ -1,11 +1,13 @@
 import { scaleLinear } from "d3-scale";
 import { create, select } from "d3-selection";
 
-export function plot(root, layers) {
+export function plot(root, layers, style = {}) {
   let rect = root.getBoundingClientRect();
 
-  let x = scaleLinear([0, 2 ** 16], [0, rect.width]);
-  let y = scaleLinear([0, 2 ** 16], [0, rect.height]);
+  let paddingX = style.paddingX ?? 0;
+  let paddingY = style.paddingY ?? 0;
+  let x = scaleLinear([0, 2 ** 16], [0 + paddingX, rect.width - paddingX]);
+  let y = scaleLinear([0, 2 ** 16], [0 + paddingY, rect.height - paddingY]);
 
   let key = (datum, index) => (datum != null ? datum.key : index);
   let children = select(root).selectAll((_, index, nodes) => nodes[index].children);
