@@ -21,13 +21,13 @@ npm install vepr
 And used as a node module
 
 ```js
-import { plot, dot } from "vepr";
+import { render, blueprint, dot } from "vepr";
 ```
 
 Or accessed via CDNs like unpkg.com right in the browser environment
 
 ```html
 <script type="module">
-  import { plot, dot } from "https://unpkg.com/vepr@0.0.0";
+  import { render, blueprint, dot } from "https://unpkg.com/vepr@0.0.0";
 </script>
 ```

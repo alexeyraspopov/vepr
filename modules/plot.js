@@ -1,6 +1,9 @@
 import { scaleLinear } from "d3-scale";
 import { create, select } from "d3-selection";
 
+/**
+ * @deprecated use blueprint() and render()
+ */
 export function plot(root, layers, style = {}) {
   let rect = root.getBoundingClientRect();
 
