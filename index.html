@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <style>
+      @media (prefers-color-scheme: dark) {
+        html {
+          color: white;
+          background: #050505;
+        }
+      }
+      @media (prefers-color-scheme: light) {
+        html {
+          color: #050505;
+          background: white;
+        }
+      }
+      body {
+        max-width: 550px;
+        margin: 0 auto;
+        padding: 0 2%;
+        font: normal 16px/1.5 system-ui;
+      }
+      svg {
+        border: 1px solid;
+        margin: 1em 0;
+        display: block;
+        aspect-ratio: 5 / 3;
+      }
+    </style>
+    <script>
+      window.basicDataset = [
+        { key: "a", value: 13 },
+        { key: "b", value: 20 },
+        { key: "c", value: 10 },
+        { key: "d", value: 5 },
+      ];
+    </script>
+    <script type="module" crossorigin src="/vepr/assets/index.b421c928.js"></script>
+  </head>
+  <body>
+    <h1>🐗</h1>
+
+    <p><strong>Vepr</strong> is a JavaScript library for exploratory data visualization.</p>
+
+    <p>
+      Vepr implements visualization protocol that is <em>optimized</em> and <em>transferable</em>.
+      This allows visualizing significant amount of data with smallest overhead. The chart
+      composition and necessary data aggregations can be delegated to a Web Worker or server side to
+      ensure UI responsiveness.
+    </p>
+
+    <svg id="horizontalBar"></svg>
+    
+
+    <svg id="verticalBar"></svg>
+    
+
+    <svg id="dot"></svg>
+    
+  </body>
+</html>
