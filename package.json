@@ -8,6 +8,7 @@
   "scripts": {
     "serve": "vite",
     "build": "rollup --config rollup.config.js",
+    "docs": "pushd docs && vite build --base /vepr",
     "postbuild": "tsc --allowJs --declaration --emitDeclarationOnly build/vepr.js"
   },
   "devDependencies": {

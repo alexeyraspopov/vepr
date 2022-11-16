@@ -1,0 +1,24 @@
+@media (prefers-color-scheme: dark) {
+  html {
+    color: white;
+    background: #050505;
+  }
+}
+@media (prefers-color-scheme: light) {
+  html {
+    color: #050505;
+    background: white;
+  }
+}
+body {
+  max-width: 550px;
+  margin: 0 auto;
+  padding: 0 2%;
+  font: normal 16px/1.5 system-ui;
+}
+svg {
+  border: 1px solid;
+  margin: 1em 0;
+  display: block;
+  aspect-ratio: 5 / 3;
+}

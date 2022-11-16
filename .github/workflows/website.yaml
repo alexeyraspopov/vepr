@@ -2,7 +2,7 @@ name: Website
 
 on:
   push:
-    branches: [ main ]
+    branches: [main]
   workflow_dispatch:
 
 jobs:
@@ -14,12 +14,12 @@ jobs:
         with:
           node-version: 16
       - run: npm install
-      - run: npx vite build --base /vepr
+      - run: npm run docs
       - name: Deploy to GitHub Pages
         uses: crazy-max/ghaction-github-pages@v2
         with:
           target_branch: gh-pages
-          build_dir: dist
+          build_dir: docs/dist
           verbose: true
         env:
           GITHUB_TOKEN: ${{ secrets.DOCS_GITHUB_TOKEN }}

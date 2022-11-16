@@ -3,32 +3,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <style>
-      @media (prefers-color-scheme: dark) {
-        html {
-          color: white;
-          background: #050505;
-        }
-      }
-      @media (prefers-color-scheme: light) {
-        html {
-          color: #050505;
-          background: white;
-        }
-      }
-      body {
-        max-width: 550px;
-        margin: 0 auto;
-        padding: 0 2%;
-        font: normal 16px/1.5 system-ui;
-      }
-      svg {
-        border: 1px solid;
-        margin: 1em 0;
-        display: block;
-        aspect-ratio: 5 / 3;
-      }
-    </style>
+    <link rel="stylesheet" type="text/css" href="./index.css" />
     <script>
       window.basicDataset = [
         { key: "a", value: 13 },
@@ -52,7 +27,7 @@
 
     <svg id="horizontalBar"></svg>
     <script type="module">
-      import { blueprint, render, barX, basic } from "./modules";
+      import { blueprint, render, barX, basic } from "../modules";
 
       let bp = blueprint({
         marks: [
@@ -71,7 +46,7 @@
 
     <svg id="verticalBar"></svg>
     <script type="module">
-      import { blueprint, render, barY, basic } from "./modules";
+      import { blueprint, render, barY, basic } from "../modules";
 
       let bp = blueprint({
         marks: [
@@ -92,7 +67,7 @@
 
     <svg id="dot"></svg>
     <script type="module">
-      import { blueprint, render, dot, basic } from "./modules";
+      import { blueprint, render, dot, basic } from "../modules";
 
       let dotted = [
         { a: 0, b: 2 },
