@@ -6,10 +6,10 @@
   "license": "ISC",
   "repository": "alexeyraspopov/vepr",
   "scripts": {
-    "serve": "pushd docs && vite",
+    "serve": "cd docs && vite",
     "build": "rollup --config rollup.config.js",
     "test": "vitest run --coverage",
-    "docs": "pushd docs && vite build --base /vepr",
+    "docs": "cd docs && vite build --base /vepr",
     "postbuild": "tsc --allowJs --declaration --emitDeclarationOnly build/vepr.js"
   },
   "devDependencies": {
