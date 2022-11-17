@@ -27,13 +27,13 @@
 
     <svg id="horizontalBar"></svg>
     <script type="module">
-      import { blueprint, render, barX, basic } from "../modules";
+      import { blueprint, render, barX, identity } from "../modules";
 
       let bp = blueprint({
         marks: [
           barX(
             window.basicDataset,
-            basic({
+            identity({
               domain: { y: [0, 25] },
               x: "key",
               y: "value",
@@ -46,13 +46,13 @@
 
     <svg id="verticalBar"></svg>
     <script type="module">
-      import { blueprint, render, barY, basic } from "../modules";
+      import { blueprint, render, barY, identity } from "../modules";
 
       let bp = blueprint({
         marks: [
           barY(
             window.basicDataset,
-            basic({
+            identity({
               // domain selection should be a part of transform(encodings)
               domain: { x: [0, 25] },
               // should this be just "ordinal"/"cont" to avoid x/y confusion? how observable resolves it?
@@ -67,7 +67,7 @@
 
     <svg id="dot"></svg>
     <script type="module">
-      import { blueprint, render, dot, basic } from "../modules";
+      import { blueprint, render, dot, identity } from "../modules";
 
       let dotted = [
         { a: 0, b: 2 },
@@ -76,7 +76,7 @@
         { a: 3, b: 3 },
         { a: 4, b: 2 },
       ];
-      let bp = blueprint({ marks: [dot(dotted, basic({ x: "a", y: "b" }))] });
+      let bp = blueprint({ marks: [dot(dotted, identity({ x: "a", y: "b" }))] });
       render(bp, window.dot, { paddingX: 5, paddingY: 5 });
     </script>
   </body>
