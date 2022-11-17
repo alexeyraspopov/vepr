@@ -1,10 +1,10 @@
-import { scaleLinear, scaleBand } from "d3-scale";
+import { Linear, Band } from "../scale/scale.js";
 
 export function barX(data, encodings) {
   let contdomain = encodings.domain.y;
-  let cont = scaleLinear(contdomain, [2 ** 16, 0]);
+  let cont = Linear(contdomain, [2 ** 16, 0]);
   let orddomain = data.map((datum) => datum[encodings.x]);
-  let ord = scaleBand(orddomain, [0, 2 ** 16]).padding(0.1);
+  let ord = Band(orddomain, [0, 2 ** 16], 0.1, 0.1);
   return {
     key: "bar",
     shapes: [
@@ -30,9 +30,9 @@ export function barX(data, encodings) {
 
 export function barY(data, encodings) {
   let contdomain = encodings.domain.x;
-  let cont = scaleLinear(contdomain, [0, 2 ** 16]);
+  let cont = Linear(contdomain, [0, 2 ** 16]);
   let orddomain = data.map((datum) => datum[encodings.y]);
-  let ord = scaleBand(orddomain, [2 ** 16, 0]).padding(0.1);
+  let ord = Band(orddomain, [2 ** 16, 0], 0.1, 0.1);
   return {
     key: "bar",
     shapes: [

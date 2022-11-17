@@ -1,15 +1,11 @@
-import { extent } from "d3-array";
-import { scaleLinear } from "d3-scale";
+import { extent } from "../scale/array.js";
+import { Linear } from "../scale/scale.js";
 
 export function dot(data, encodings) {
-  let h = scaleLinear(
-    extent(data, (datum) => datum[encodings.x]),
-    [0, 2 ** 16],
-  );
-  let v = scaleLinear(
-    extent(data, (datum) => datum[encodings.y]),
-    [2 ** 16, 0],
-  );
+  let hdomain = extent(data, (datum) => datum[encodings.x]);
+  let h = Linear(hdomain, [0, 2 ** 16]);
+  let vdomain = extent(data, (datum) => datum[encodings.y]);
+  let v = Linear(vdomain, [2 ** 16, 0]);
   return {
     key: "dot",
     shapes: [

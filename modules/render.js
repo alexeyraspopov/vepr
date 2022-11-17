@@ -1,5 +1,5 @@
-import { scaleLinear } from "d3-scale";
-import { create, select } from "d3-selection";
+import { create, select } from "./d3-selection.js";
+import { Linear } from "./scale/scale.js";
 
 /**
  * Render a visualization blueprint using SVG
@@ -12,8 +12,8 @@ export function render(blueprint, root, style) {
 
   let paddingX = style?.paddingX ?? 0;
   let paddingY = style?.paddingY ?? 0;
-  let x = scaleLinear([0, 2 ** 16], [0 + paddingX, rect.width - paddingX]);
-  let y = scaleLinear([0, 2 ** 16], [0 + paddingY, rect.height - paddingY]);
+  let x = Linear([0, 2 ** 16], [0 + paddingX, rect.width - paddingX]);
+  let y = Linear([0, 2 ** 16], [0 + paddingY, rect.height - paddingY]);
   let children = select(root).selectAll((_, index, nodes) => nodes[index].children);
   let key = (datum, index) => (datum != null ? datum.key : index);
 
