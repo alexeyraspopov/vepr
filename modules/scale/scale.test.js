@@ -1,6 +1,16 @@
 import { test, expect } from "vitest";
-import { Linear, Ordinal, Band, Clamp, Point, Threshold, Quantile, Quantize, Log } from "./scale";
-import { linticks } from "./array";
+import {
+  Linear,
+  Ordinal,
+  Band,
+  Clamp,
+  Point,
+  Threshold,
+  Quantile,
+  Quantize,
+  Log,
+} from "./scale.js";
+import { linticks } from "./array.js";
 
 test("basic interpolation", () => {
   let scale = Linear([0, 10], [-10, 10]);

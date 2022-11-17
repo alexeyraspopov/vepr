@@ -1,10 +1,11 @@
 {
   "name": "vepr",
   "version": "0.0.0",
-  "description": "Visualization Protocol",
+  "description": "A JavaScript library for exploratory data visualization",
   "author": "Alexey Raspopov",
   "license": "ISC",
   "repository": "alexeyraspopov/vepr",
+  "homepage": "https://alexeyraspopov.github.io/vepr",
   "scripts": {
     "serve": "cd docs && vite",
     "build": "rollup --config rollup.config.js",

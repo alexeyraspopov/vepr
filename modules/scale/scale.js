@@ -1,4 +1,4 @@
-import { bisect, rank, quantileSorted } from "./array";
+import { bisect, rank, quantileSorted } from "./array.js";
 
 export function Linear(domain, range) {
   return domain.length > 2 || range.length > 2
@@ -47,9 +47,11 @@ export function Clamp(range) {
 
 export function Quantile(domain, range) {
   let n = range.length;
-  let ps = rank(domain);
-  let value = (p) => domain[p];
-  let thresholds = Array.from({ length: n - 1 }, (_, i) => quantileSorted(ps, (i + 1) / n, value));
+  let pointers = rank(domain);
+  let value = (pointer) => domain[pointer];
+  let thresholds = Array.from({ length: n - 1 }, (_, i) => {
+    return quantileSorted(pointers, (i + 1) / n, value);
+  });
   return Threshold(thresholds, range);
 }
 
@@ -65,12 +67,20 @@ export function Quantize(domain, range) {
 export function Diverging() {}
 
 export function Band(domain, range, paddingInner = 0, paddingOuter = 0, align = 0.5) {
-  let step = (range[1] - range[0]) / Math.max(1, domain.length - paddingInner + paddingOuter * 2);
-  let start = range[0] + (range[1] - range[0] - step * (domain.length - paddingInner)) * align;
-  return (x) => {
-    let index = domain.indexOf(x);
-    return index >= 0 ? step * index + start : undefined;
-  };
+  let reverse = range[1] < range[0];
+  let r0 = reverse ? range[1] : range[0];
+  let r1 = reverse ? range[0] : range[1];
+  let step = (r1 - r0) / Math.max(1, domain.length - paddingInner + paddingOuter * 2);
+  let bandwidth = step * (1 - paddingInner);
+  let start = r0 + (r1 - r0 - step * (domain.length - paddingInner)) * align;
+  return Object.assign(
+    (x) => {
+      let i = domain.indexOf(x);
+      let index = reverse && i >= 0 ? domain.length - 1 - i : i;
+      return index >= 0 ? step * index + start : undefined;
+    },
+    { bandwidth: () => bandwidth },
+  );
 }
 
 export function Point(domain, range, padding = 0, align = 0.5) {
