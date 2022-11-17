@@ -19,8 +19,8 @@ export function rank(values, valueOf = identity) {
  * @param {Array<T>} values
  * @param {T} x
  */
-export function bisect(values, x, lo = 0, hi = values.length - 1) {
-  while (lo <= hi) {
+export function bisect(values, x, lo = 0, hi = values.length) {
+  while (lo < hi) {
     let mid = (lo + hi) >>> 1;
     if (values[mid] <= x) lo = mid + 1;
     else hi = mid;

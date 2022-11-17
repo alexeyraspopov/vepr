@@ -26,11 +26,11 @@ function logp(base) {
 }
 
 function PolyLinear(domain, range) {
-  let limit = Math.min(domain.length, range.length);
+  let limit = Math.min(domain.length, range.length) - 1;
   let lines = Array.from({ length: limit }, (_, i) => {
     return Linear([domain[i], domain[i + 1]], [range[i], range[i + 1]]);
   });
-  return (x) => lines[bisect(domain, x, 1, limit - 1) - 1](x);
+  return (x) => lines[bisect(domain, x, 1, limit) - 1](x);
 }
 
 export function Ordinal(domain, range) {
