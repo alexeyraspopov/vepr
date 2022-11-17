@@ -5,3 +5,5 @@ export { basic } from "./transform/basic.js";
 
 export { blueprint } from "./blueprint.js";
 export { render } from "./render.js";
+
+export { transferables } from "./transferables.js";
