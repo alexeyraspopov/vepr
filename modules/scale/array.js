@@ -65,16 +65,46 @@ export function identity(value) {
   return value;
 }
 
-// https://en.wikipedia.org/wiki/Quantile#Quantiles_of_a_population
-export function quantileSorted(values, p, valueOf = (v, i, a) => v) {
-  var n = values.length;
-  if (p <= 0 || n < 2) return +valueOf(values[0], 0, values);
-  if (p >= 1) return +valueOf(values[n - 1], n - 1, values);
-  let i = (n - 1) * p;
-  let i0 = Math.floor(i);
-  let value0 = +valueOf(values[i0], i0, values);
-  let value1 = +valueOf(values[i0 + 1], i0 + 1, values);
-  return value0 + (value1 - value0) * (i - i0);
+/**
+ * Returns max value of an array. Returns undefined if the target array is empty.
+ *
+ * @template T
+ * @template [R=T] Default is `T`
+ * @param {T[]} values
+ * @param {(value: T, index?: number, values?: T[]) => R} [valueOf=identity] Default is `identity`
+ * @returns {R | undefined}
+ */
+export function max(values, valueOf = identity) {
+  if (values.length === 0) return undefined;
+  let max = valueOf(values[0], 0, values);
+  for (let index = 1; index < values.length; index++) {
+    let value = valueOf(values[index], index, values);
+    if (value != null && max < value) {
+      max = value;
+    }
+  }
+  return max;
+}
+
+/**
+ * Returns min value of an array. Returns undefined if the target array is empty.
+ *
+ * @template T
+ * @template [R=T] Default is `T`
+ * @param {T[]} values
+ * @param {(value: T, index?: number, values?: T[]) => R} [valueOf=identity] Default is `identity`
+ * @returns {R | undefined}
+ */
+export function min(values, valueOf = identity) {
+  if (values.length === 0) return undefined;
+  let min = valueOf(values[0], 0, values);
+  for (let index = 1; index < values.length; index++) {
+    let value = valueOf(values[index], index, values);
+    if (value != null && min > value) {
+      min = value;
+    }
+  }
+  return min;
 }
 
 let e10 = Math.sqrt(50);

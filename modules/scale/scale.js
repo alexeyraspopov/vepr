@@ -1,4 +1,5 @@
-import { bisect, rank, quantileSorted } from "./array.js";
+import { bisect, rank } from "./array.js";
+import { quantileSorted } from "./quantile.js";
 
 export function Linear(domain, range) {
   return domain.length > 2 || range.length > 2
