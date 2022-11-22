@@ -1,6 +1,11 @@
 import { extent } from "../scale/array.js";
 import { Linear } from "../scale/scale.js";
 
+/**
+ * Dots
+ *
+ * @returns {Mark}
+ */
 export function dot(data, encodings) {
   let hdomain = extent(data, (datum) => datum[encodings.x]);
   let h = Linear(hdomain, [0, 2 ** 16]);

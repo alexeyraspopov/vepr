@@ -1,8 +1,9 @@
 /**
- * Collect references to all values that can be transferred via postMessage().
- * See https://developer.mozilla.org/en-US/docs/Glossary/Transferable_objects
- * @param {any} input - any nested data structure to collect transferables from
- * @returns {Array<Transferable>} a collection of transferable refs
+ * Collect references to all values that can be transferred via postMessage(). See
+ * https://developer.mozilla.org/en-US/docs/Glossary/Transferable_objects
+ *
+ * @param {any} input - Any nested data structure to collect transferables from
+ * @returns {Transferable[]} A collection of transferable refs
  */
 export function transferables(input) {
   return Array.from(getTransferableValues(input));

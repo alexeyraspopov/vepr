@@ -1,8 +1,11 @@
 /**
  * Compute an array of indices of values sorted in ascending order
+ *
  * @template T
- * @param {Array<T>} values
- * @param {(value: T) => any} [valueOf]
+ * @template [R=T] Default is `T`
+ * @param {T[]} values
+ * @param {(value: T, index?: number, values?: T[]) => R} [valueOf=identity] Default is `identity`
+ * @returns {Uint32Array}
  */
 export function rank(values, valueOf = identity) {
   return Uint32Array.from(values, (_, i) => i).sort((iA, iB) => {
@@ -16,7 +19,7 @@ export function rank(values, valueOf = identity) {
 
 /**
  * @template T
- * @param {Array<T>} values
+ * @param {T[]} values
  * @param {T} x
  */
 export function bisect(values, x, lo = 0, hi = values.length) {
@@ -29,9 +32,14 @@ export function bisect(values, x, lo = 0, hi = values.length) {
 }
 
 /**
+ * Returns a tuple of [min, max] values of an array. Returns [undefined, undefined] if the target
+ * array is empty.
+ *
  * @template T
- * @param {Array<T>} values
- * @param {(value: T) => any} [valueOf]
+ * @template [R=T] Default is `T`
+ * @param {T[]} values
+ * @param {(value: T, index?: number, values?: T[]) => R} [valueOf=identity] Default is `identity`
+ * @returns {[R, R] | [undefined, undefined]} Tuple of min and max values
  */
 export function extent(values, valueOf = identity) {
   if (values.length === 0) return [undefined, undefined];
@@ -46,11 +54,14 @@ export function extent(values, valueOf = identity) {
 }
 
 /**
+ * Basic reusable function that can often be used as a default value for when mapping is
+ * unnecessary.
+ *
  * @template T
  * @param {T} value
- * @return {T}
+ * @returns {T}
  */
-function identity(value) {
+export function identity(value) {
   return value;
 }
 
@@ -92,8 +103,12 @@ export function linticks(start, stop, count) {
 }
 
 /**
- * A comparator that ensures ascending order and handles nulls and NaNs.
- * Resulting order is [x0, x1, x2, x3, x..., NaN..., null..., undefined...]
+ * A comparator that ensures ascending order and handles nulls and NaNs. Resulting order is
+ * following: [x0, x1, x2, x3, x..., NaN..., null..., undefined...]
+ *
+ * @template T
+ * @param {T} a
+ * @param {T} b
  */
 export function ascending(a, b) {
   // prettier-ignore
@@ -101,8 +116,12 @@ export function ascending(a, b) {
 }
 
 /**
- * A comparator that ensures descending order and handles nulls and NaNs.
- * Resulting order is [x4, x3, x2, x1, x..., NaN..., null..., undefined...]
+ * A comparator that ensures descending order and handles nulls and NaNs. Resulting order is
+ * following: [x4, x3, x2, x1, x..., NaN..., null..., undefined...]
+ *
+ * @template T
+ * @param {T} a
+ * @param {T} b
  */
 export function descending(a, b) {
   // prettier-ignore

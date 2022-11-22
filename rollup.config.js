@@ -15,27 +15,24 @@ export default {
 
 function generatePkg(contents) {
   let pkg = JSON.parse(contents.toString());
-  return JSON.stringify(
-    {
-      name: pkg.name,
-      version: pkg.version,
-      description: pkg.description,
-      license: pkg.license,
-      author: pkg.author,
-      homepage: pkg.homepage,
-      repository: pkg.repository,
-      type: "module",
-      main: "./vepr.js",
-      module: "./vepr.js",
-      exports: "./vepr.js",
-      types: "./vepr.d.ts",
-      files: ["*.js", "*.d.ts"],
-      sideEffects: false,
-      keywords: pkg.keywords,
-      dependencies: pkg.dependencies,
-      peerDependencies: pkg.peerDependencies,
-    },
-    null,
-    2,
-  );
+  let newPkg = {
+    name: pkg.name,
+    version: pkg.version,
+    description: pkg.description,
+    license: pkg.license,
+    author: pkg.author,
+    homepage: pkg.homepage,
+    repository: pkg.repository,
+    type: "module",
+    main: "./vepr.js",
+    module: "./vepr.js",
+    exports: "./vepr.js",
+    types: "./vepr.d.ts",
+    files: ["*.js", "*.d.ts"],
+    sideEffects: false,
+    keywords: pkg.keywords,
+    dependencies: pkg.dependencies,
+    peerDependencies: pkg.peerDependencies,
+  };
+  return JSON.stringify(newPkg, null, 2);
 }

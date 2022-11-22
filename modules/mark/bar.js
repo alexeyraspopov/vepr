@@ -1,5 +1,10 @@
 import { Linear, Band } from "../scale/scale.js";
 
+/**
+ * Bars
+ *
+ * @returns {Mark}
+ */
 export function barX(data, encodings) {
   let contdomain = encodings.domain.y;
   let cont = Linear(contdomain, [2 ** 16, 0]);
@@ -28,6 +33,11 @@ export function barX(data, encodings) {
   };
 }
 
+/**
+ * Bars
+ *
+ * @returns {Mark}
+ */
 export function barY(data, encodings) {
   let contdomain = encodings.domain.x;
   let cont = Linear(contdomain, [0, 2 ** 16]);

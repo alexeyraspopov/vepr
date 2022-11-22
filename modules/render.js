@@ -2,9 +2,10 @@ import { Linear } from "./scale/scale.js";
 
 /**
  * Render a visualization blueprint using SVG
- * @param {Blueprint} blueprint - a thing to render
- * @param {SVGSVGElement} root - container to render to
- * @param {object} [style] - additional container styles
+ *
+ * @param {Blueprint} blueprint A thing to render
+ * @param {SVGSVGElement} root Container to render to
+ * @param {object} [style] Additional container styles
  */
 export function render(blueprint, root, style) {
   let rect = root.getBoundingClientRect();
