@@ -33,8 +33,8 @@ export function Linear(domain, range, transform = identity) {
     return (x) => lines[bisect(domain, x, 1, limit) - 1](x);
   }
   let [x0, x1] = range;
-  let normalize = (x) => x0 * (1 - x) + x1 * x;
-  return Sequential([domain[0], domain[1]], normalize, transform);
+  let interpolate = (x) => x0 * (1 - x) + x1 * x;
+  return Sequential([domain[0], domain[1]], interpolate, transform);
 }
 
 /**

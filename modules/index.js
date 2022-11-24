@@ -8,7 +8,7 @@ export { render } from "./render.js";
 
 export { transferables } from "./transferables.js";
 
-export { rank, bisect, extent, ascending, descending } from "./scale/array.js";
+export { rank, bisect, extent, min, max, ascending, descending } from "./scale/array.js";
 export {
   Linear,
   Ordinal,

@@ -9,9 +9,9 @@
  */
 export function rank(values, valueOf = identity) {
   return Uint32Array.from(values, (_, i) => i).sort((iA, iB) => {
-    let a = valueOf(values[iA]);
+    let a = valueOf(values[iA], iA, values);
     if (a === null) return 1;
-    let b = valueOf(values[iB]);
+    let b = valueOf(values[iB], iB, values);
     if (b === null) return -1;
     return a === b ? 0 : a < b ? -1 : a > b ? 1 : isNaN(a) ? 1 : isNaN(b) ? -1 : 0;
   });
@@ -43,12 +43,12 @@ export function bisect(values, x, lo = 0, hi = values.length) {
  */
 export function extent(values, valueOf = identity) {
   if (values.length === 0) return [undefined, undefined];
-  let min = valueOf(values[0]);
+  let min = valueOf(values[0], 0, values);
   let max = min;
-  for (let index = 0; index < values.length; index++) {
-    let value = valueOf(values[index]);
-    if (value < min) min = value;
+  for (let index = 1; index < values.length; index++) {
+    let value = valueOf(values[index], index, values);
     if (value > max) max = value;
+    else if (value < min) min = value;
   }
   return [min, max];
 }
