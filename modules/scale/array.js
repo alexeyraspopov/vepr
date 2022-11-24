@@ -111,7 +111,7 @@ let e10 = Math.sqrt(50);
 let e5 = Math.sqrt(10);
 let e2 = Math.sqrt(2);
 
-export function linticks(start, stop, count) {
+export function linearTicks(start, stop, count) {
   // allow descending ticks generation
   let reverse = start > stop;
   let [lo, hi] = reverse ? [stop, start] : [start, stop];
