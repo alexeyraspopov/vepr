@@ -12,6 +12,7 @@ import {
   pow,
   symlog,
   Diverging,
+  Track,
 } from "./scale.js";
 import { linearTicks } from "./array.js";
 
@@ -188,6 +189,37 @@ test("point", () => {
   expect(scaleE("a")).toEqual(60);
   expect(scaleE("b")).toEqual(180);
   expect(scaleE("c")).toEqual(300);
+});
+
+test("track", () => {
+  let scaleA = Track(["1f", "1f", "1f"], 300);
+  expect(scaleA(0)).toEqual([0, 0 + 100]);
+  expect(scaleA(1)).toEqual([100, 100 + 100]);
+  expect(scaleA(2)).toEqual([200, 200 + 100]);
+  expect(scaleA(0, 2)).toEqual([0, 0 + 200]);
+  expect(scaleA(1, 2)).toEqual([100, 100 + 200]);
+
+  let scaleB = Track(["1f", "1f", "1f"], 300, 4);
+  expect(scaleB(0)).toEqual([4, 4 + 97.33333333333333]);
+  expect(scaleB(1)).toEqual([101.33333333333333, 101.33333333333333 + 97.33333333333333]);
+  expect(scaleB(2)).toEqual([198.66666666666666, 198.66666666666666 + 97.33333333333333]);
+  expect(scaleB(0, 2)).toEqual([4, 4 + 194.66666666666666]);
+  expect(scaleB(1, 2)).toEqual([101.33333333333333, 101.33333333333333 + 194.66666666666666]);
+
+  let scaleC = Track(["1f", "1f", "1f"], 300, 4, 2);
+  expect(scaleC(0)).toEqual([4, 4 + 96]);
+  expect(scaleC(1)).toEqual([102, 102 + 96]);
+  expect(scaleC(2)).toEqual([200, 200 + 96]);
+  expect(scaleC(0, 2)).toEqual([4, 4 + 194]);
+  expect(scaleC(1, 2)).toEqual([102, 102 + 194]);
+
+  let scaleD = Track(["20u", "1f", "2f"], 512, 4, 2);
+  expect(scaleD(1, 2)).toEqual([26, 26 + 482]);
+  expect(scaleD(0, 1)).toEqual([4, 4 + 20]);
+
+  let scaleE = Track(["20u", "1f", "2f", "30%"], 512, 4, 2);
+  expect(scaleE(1, 2)).toEqual([26, 26 + 328.8]);
+  expect(scaleE(3, 1)).toEqual([356.8, 356.8 + 151.2]);
 });
 
 test("ticks", () => {
