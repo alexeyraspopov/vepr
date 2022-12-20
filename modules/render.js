@@ -1,57 +1,76 @@
-import { Linear } from "./scale/scale.js";
+import { Linear, Track } from "./scale/scale.js";
 
 /**
- * Render a visualization blueprint using SVG
+ * Render a visualization blueprint using Canvas
  *
  * @param {Blueprint} blueprint A thing to render
- * @param {SVGSVGElement} root Container to render to
- * @param {object} [style] Additional container styles
+ * @param {HTMLCanvasElement} root Container to render to
  */
-export function render(blueprint, root, style) {
+export function render(blueprint, root) {
   let rect = root.getBoundingClientRect();
+  let ctx = root.getContext("2d");
+  let trackX = Track(["40u", "1f"], rect.width, 25, 2);
+  let trackY = Track(["1f", "40u"], rect.height, 10, 2);
 
-  let paddingX = style?.paddingX ?? 0;
-  let paddingY = style?.paddingY ?? 0;
-  let x = Linear([0, 2 ** 16], [0 + paddingX, rect.width - paddingX]);
-  let y = Linear([0, 2 ** 16], [0 + paddingY, rect.height - paddingY]);
-  let layout = document.createDocumentFragment();
+  // Real canvas element size in dom is different from the drawing canvas available
+  // The drawing canvas needs to be readjusted accordingly to the size available,
+  // device pixel ratio and additional scaling factor for better image quality.
+  let scaleFactor = 4;
+  let ratio = window.devicePixelRatio * scaleFactor;
+  root.width = rect.width * ratio;
+  root.height = rect.height * ratio;
+  ctx.scale(ratio, ratio);
+  // HACK canvas only picks up currentColor if defined via style attribute
+  root.style.color = getComputedStyle(root).getPropertyValue("color");
+  let x = Linear([0, 2 ** 16], trackX(1, 1));
+  let y = Linear([0, 2 ** 16], trackY(0, 1));
   for (let layer of blueprint.layers) {
-    let group = createElement("g", "svg");
+    let shapes = layer.shapes.map(function sh(shape) {
+      let pairs = Object.keys(shape.attrs).map((key) => `${key}: ${shape.attrs[key]}`);
+      let attrs = new Function("x", "y", "d", `return { ${pairs.join(",")} }`);
+      let render = getShapeByTag(shape.tag);
+      return { attrs, render };
+    });
+
+    let cursor;
+    let reader = new Proxy(Object.prototype, {
+      get(_, key) {
+        if (key in layer.channels) return layer.channels[key][cursor];
+        else throw new Error("Unable to find channel " + key);
+      },
+    });
+
+    ctx.save();
     for (let pointer of layer.channels.index) {
-      let fragment = document.createDocumentFragment();
-      for (let shape of layer.shapes) {
-        let node = createElement(shape.tag, "svg");
-        let scope = { x, y, d: getDatumReaderBy(pointer, layer.channels) };
-        for (let key in shape.attrs) {
-          let expr = shape.attrs[key];
-          let fn = new Function("scope", "with (scope) return " + expr);
-          node.setAttribute(key, fn(scope));
-        }
-        fragment.appendChild(node);
+      cursor = pointer;
+      for (let shape of shapes) {
+        shape.render(ctx, shape.attrs(x, y, reader));
       }
-      group.appendChild(fragment);
     }
-    layout.appendChild(group);
+    ctx.restore();
   }
-  root.appendChild(layout);
 }
 
-function getDatumReaderBy(pointer, channels) {
-  return new Proxy(Object.prototype, {
-    get(_, key) {
-      if (key in channels) return channels[key][pointer];
-      else throw new Error("Unable to find channel " + key);
-    },
-  });
+function getShapeByTag(tag) {
+  switch (tag) {
+    case "circle":
+      return circle;
+    case "rect":
+      return rect;
+    default:
+      return Function.prototype;
+  }
 }
 
-var uris = {
-  svg: "http://www.w3.org/2000/svg",
-  xhtml: "http://www.w3.org/1999/xhtml",
-  xlink: "http://www.w3.org/1999/xlink",
-  xml: "http://www.w3.org/XML/1998/namespace",
-  xmlns: "http://www.w3.org/2000/xmlns/",
-};
-function createElement(name, type) {
-  return type == null ? document.createElement(name) : document.createElementNS(uris[type], name);
+function circle(ctx, attrs) {
+  ctx.beginPath();
+  ctx.arc(attrs.cx, attrs.cy, attrs.r, 0, 2 * Math.PI, false);
+  ctx.strokeStyle = attrs.stroke;
+  ctx.stroke();
+}
+
+function rect(ctx, attrs) {
+  ctx.rect(attrs.x, attrs.y, attrs.width, attrs.height);
+  ctx.fillStyle = attrs.fill;
+  ctx.fill();
 }

@@ -25,7 +25,7 @@
       ensure UI responsiveness.
     </p>
 
-    <svg id="horizontalBar"></svg>
+    <canvas id="horizontalBar"></canvas>
     <script type="module">
       import { blueprint, render, barX, identity } from "../modules";
 
@@ -44,7 +44,7 @@
       render(bp, window.horizontalBar);
     </script>
 
-    <svg id="verticalBar"></svg>
+    <canvas id="verticalBar"></canvas>
     <script type="module">
       import { blueprint, render, barY, identity } from "../modules";
 
@@ -65,19 +65,14 @@
       render(bp, window.verticalBar);
     </script>
 
-    <svg id="dot"></svg>
+    <canvas id="dot"></canvas>
     <script type="module">
       import { blueprint, render, dot, identity } from "../modules";
 
-      let dotted = [
-        { a: 0, b: 2 },
-        { a: 1, b: 3 },
-        { a: 2, b: 4 },
-        { a: 3, b: 3 },
-        { a: 4, b: 2 },
-      ];
+      let rand = (max) => Math.random() * max;
+      let dotted = Array.from({ length: 100 }, () => ({ a: rand(10), b: rand(10) }));
       let bp = blueprint({ marks: [dot(dotted, identity({ x: "a", y: "b" }))] });
-      render(bp, window.dot, { paddingX: 5, paddingY: 5 });
+      render(bp, window.dot);
     </script>
   </body>
 </html>

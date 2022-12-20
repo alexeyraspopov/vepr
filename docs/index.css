@@ -16,7 +16,8 @@ body {
   padding: 0 2%;
   font: normal 16px/1.5 system-ui;
 }
-svg {
+canvas {
+  width: 100%;
   border: 1px solid;
   margin: 1em 0;
   display: block;
