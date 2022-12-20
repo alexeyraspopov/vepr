@@ -20,7 +20,5 @@ export {
   Sequential,
   Band,
   Point,
-  pow,
-  log,
-  symlog,
 } from "./scale/scale.js";
+export { pow, log, symlog } from "./scale/number.js";

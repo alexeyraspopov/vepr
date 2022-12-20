@@ -8,12 +8,10 @@ import {
   Threshold,
   Quantile,
   Quantize,
-  log,
-  pow,
-  symlog,
   Diverging,
   Track,
 } from "./scale.js";
+import { log, pow, symlog } from "./number.js";
 import { linearTicks } from "./array.js";
 
 test("basic interpolation", () => {
