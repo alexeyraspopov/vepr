@@ -18,8 +18,8 @@ export function barX(data, encodings) {
         attrs: {
           x: "x(d.x)",
           y: "y(d.y)",
-          width: `x(${ord.bandwidth()})`,
-          height: "y(2 ** 16 - d.y)",
+          width: `x(${ord.bandwidth()}) - x(0)`,
+          height: "y(2 ** 16) - y(d.y)",
           fill: "'currentColor'",
         },
       },
@@ -49,10 +49,10 @@ export function barY(data, encodings) {
       {
         tag: "rect",
         attrs: {
-          x: 0,
+          x: "x(0)",
           y: "y(d.y)",
           width: `x(d.x)`,
-          height: `y(${ord.bandwidth()})`,
+          height: `y(${ord.bandwidth()}) - y(0)`,
           fill: "'currentColor'",
         },
       },
