@@ -25,6 +25,19 @@
       ensure UI responsiveness.
     </p>
 
+    <p>
+      Vepr renders using
+      <a href="https://developer.mozilla.org/en-US/docs/Web/API/Canvas_API" target="_blank"
+        >HTML Canvas</a
+      >. This allows to handle more data without affecting UI performance.
+    </p>
+
+    <p>
+      🚧 This project is still in development. Follow
+      <a href="https://github.com/alexeyraspopov/vepr" target="_blank">GitHub repo</a> for updates
+      and discussions.
+    </p>
+
     <canvas id="horizontalBar"></canvas>
     <script type="module">
       import { blueprint, render, barX, identity } from "../modules";
@@ -74,5 +87,7 @@
       let bp = blueprint({ marks: [dot(dotted, identity({ x: "a", y: "b" }))] });
       render(bp, window.dot);
     </script>
+
+    <footer><p>ISC License &copy; 2022 Alexey Raspopov</p></footer>
   </body>
 </html>

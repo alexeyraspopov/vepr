@@ -14,7 +14,15 @@ body {
   max-width: 550px;
   margin: 0 auto;
   padding: 0 2%;
-  font: normal 16px/1.5 system-ui;
+  font: normal 16px/1.5 Helvetica;
+}
+a {
+  color: currentColor;
+  text-decoration: none;
+  border-bottom: 1px solid;
+}
+a:hover {
+  border-bottom: none;
 }
 canvas {
   width: 100%;
