@@ -9,9 +9,13 @@ export function transferables(input) {
   return Array.from(getTransferableValues(input));
 }
 
-let TypedArray = Object.getPrototypeOf(Float32Array);
+/**
+ * @param {any} input
+ * @returns {Generator<Transferable>}
+ */
 function* getTransferableValues(input) {
-  if (input instanceof TypedArray) yield input.buffer;
+  if (ArrayBuffer.isView(input)) yield input.buffer;
+  if (input instanceof ArrayBuffer) yield input;
 
   if (input != null && typeof input === "object") {
     for (let key in input) {

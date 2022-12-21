@@ -1,6 +1,16 @@
-import { identity, min, max, ascending } from "./array.js";
+import { min, max, ascending } from "./array.js";
 
-export function quantile(values, p, valueOf = identity) {
+/**
+ * Quantile of population
+ *
+ * @template T
+ * @template [R=T] Default is `T`
+ * @param {T[]} values
+ * @param {number} p
+ * @param {(value: T, index?: number, values?: T[]) => R} [valueOf=identity] Default is `identity`
+ * @returns {number}
+ */
+export function quantile(values, p, valueOf = identityDatum) {
   let n = values.length;
   let vs = Float64Array.from(numbers(values, valueOf));
   if (n === 0) return;
@@ -13,7 +23,7 @@ export function quantile(values, p, valueOf = identity) {
   return value0 + (value1 - value0) * (i - i0);
 }
 
-export function quantileSorted(values, p, valueOf = identity) {
+export function quantileSorted(values, p, valueOf = identityDatum) {
   var n = values.length;
   if (p <= 0 || n < 2) return +valueOf(values[0], 0, values);
   if (p >= 1) return +valueOf(values[n - 1], n - 1, values);
@@ -78,4 +88,8 @@ function swap(array2, i, j) {
   const t = array2[i];
   array2[i] = array2[j];
   array2[j] = t;
+}
+
+function identityDatum(v, i, a) {
+  return v;
 }

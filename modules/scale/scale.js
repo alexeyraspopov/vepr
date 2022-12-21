@@ -11,7 +11,7 @@ import { quantileSorted } from "./quantile.js";
  * @returns {(value: Domain) => Result}
  */
 export function Sequential(domain, interpolator, transform = identity) {
-  let [x0, x1] = domain.map(transform);
+  let [x0, x1] = Array.from(domain, transform);
   let k = +x1 - +x0;
   let normalize = k === 0 ? (x) => 0.5 : (x) => (x - +x0) / k;
   return (x) => interpolator(normalize(transform(x)));
@@ -106,7 +106,7 @@ export function Quantize(domain, range) {
  * @returns {(value: number) => Result}
  */
 export function Diverging(domain, interpolator, transform = identity) {
-  let [x0, x1, x2] = domain.map(transform);
+  let [x0, x1, x2] = Array.from(domain, transform);
   let k10 = x0 === x1 ? 0 : 0.5 / (x1 - x0);
   let k21 = x1 === x2 ? 0 : 0.5 / (x2 - x1);
   let sign = x1 < x0 ? -1 : 1;
@@ -161,8 +161,8 @@ const PERC = /^[\d\.]+%$/;
  * @example
  *   let columns = Track(["20u", "1f", "50u"], containerWidth);
  *   let rows = Track(["15u", "20u", "1f", "20u"], containerHeight);
- *   let [x, width] = columns(1);
- *   let scaleX = scaleLinear(domainX, [x, width]);
+ *   let [x0, x1] = columns(1);
+ *   let scaleX = scaleLinear(domainX, [x0, x1]);
  *
  * @param {string[]} template
  * @param {number} length

@@ -70,7 +70,6 @@ function circle(ctx, attrs) {
 }
 
 function rect(ctx, attrs) {
-  ctx.rect(attrs.x, attrs.y, attrs.width, attrs.height);
   ctx.fillStyle = attrs.fill;
-  ctx.fill();
+  ctx.fillRect(attrs.x, attrs.y, attrs.width, attrs.height);
 }

@@ -8,16 +8,14 @@
  * @returns {Uint32Array}
  */
 export function rank(values, valueOf = identity) {
-  return Uint32Array.from(values, (_, i) => i).sort((iA, iB) => {
-    let a = valueOf(values[iA], iA, values);
-    if (a === null) return 1;
-    let b = valueOf(values[iB], iB, values);
-    if (b === null) return -1;
-    return a === b ? 0 : a < b ? -1 : a > b ? 1 : isNaN(a) ? 1 : isNaN(b) ? -1 : 0;
+  return Uint32Array.from({ length: values.length }, (_, i) => i).sort((iA, iB) => {
+    return ascending(valueOf(values[iA], iA, values), valueOf(values[iB], iB, values));
   });
 }
 
 /**
+ * Bisect right
+ *
  * @template T
  * @param {T[]} values
  * @param {T} x
@@ -25,7 +23,7 @@ export function rank(values, valueOf = identity) {
 export function bisect(values, x, lo = 0, hi = values.length) {
   while (lo < hi) {
     let mid = (lo + hi) >>> 1;
-    if (values[mid] <= x) lo = mid + 1;
+    if (ascending(values[mid], x) <= 0) lo = mid + 1;
     else hi = mid;
   }
   return lo;
@@ -45,8 +43,9 @@ export function extent(values, valueOf = identity) {
   if (values.length === 0) return [undefined, undefined];
   let min = valueOf(values[0], 0, values);
   let max = min;
-  for (let index = 1; index < values.length; index++) {
-    let value = valueOf(values[index], index, values);
+  for (let index = 1, value; index < values.length; index++) {
+    value = valueOf(values[index], index, values);
+    if (value == null) continue;
     if (value > max) max = value;
     else if (value < min) min = value;
   }
@@ -77,11 +76,9 @@ export function identity(value) {
 export function max(values, valueOf = identity) {
   if (values.length === 0) return undefined;
   let max = valueOf(values[0], 0, values);
-  for (let index = 1; index < values.length; index++) {
-    let value = valueOf(values[index], index, values);
-    if (value != null && max < value) {
-      max = value;
-    }
+  for (let index = 1, value; index < values.length; index++) {
+    value = valueOf(values[index], index, values);
+    if (value != null && max < value) max = value;
   }
   return max;
 }
@@ -98,11 +95,9 @@ export function max(values, valueOf = identity) {
 export function min(values, valueOf = identity) {
   if (values.length === 0) return undefined;
   let min = valueOf(values[0], 0, values);
-  for (let index = 1; index < values.length; index++) {
-    let value = valueOf(values[index], index, values);
-    if (value != null && min > value) {
-      min = value;
-    }
+  for (let index = 1, value; index < values.length; index++) {
+    value = valueOf(values[index], index, values);
+    if (value != null && min > value) min = value;
   }
   return min;
 }
@@ -142,7 +137,7 @@ export function linearTicks(start, stop, count) {
  */
 export function ascending(a, b) {
   // prettier-ignore
-  return a === b ? 0 : a === null ? 1 : b === null ? -1 : a < b ? -1 : a > b ? 1 : isNaN(a) ? 1 : isNaN(b) ? -1 : 0;
+  return Object.is(a, b) ? 0 : a === null ? 1 : b === null ? -1 : a < b ? -1 : a > b ? 1 : isNaN(a) ? 1 : isNaN(b) ? -1 : 0;
 }
 
 /**
@@ -155,5 +150,5 @@ export function ascending(a, b) {
  */
 export function descending(a, b) {
   // prettier-ignore
-  return a === b ? 0 : a === null ? 1 : b === null ? -1 : a < b ? 1 : a > b ? -1 : isNaN(a) ? 1 : isNaN(b) ? -1 : 0;
+  return Object.is(a, b) ? 0 : a === null ? 1 : b === null ? -1 : a < b ? 1 : a > b ? -1 : isNaN(a) ? 1 : isNaN(b) ? -1 : 0;
 }
