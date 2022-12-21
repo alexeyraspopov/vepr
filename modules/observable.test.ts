@@ -1,18 +1,16 @@
 import { test, expect } from "vitest";
-import { Scope } from "./observable";
+import { ObservableContext } from "./observable";
 
 test("observable + computed", () => {
-  let ko = Scope();
+  let co = ObservableContext();
 
-  let a = ko.observable(0);
-  let b = ko.computed(() => a() * 2);
-  let c = ko.computed(() => a() + b());
+  let a = co.observable(0);
+  let b = co.computed(() => a() * 2);
+  let c = co.computed(() => a() + b());
 
   expect(a()).toEqual(0);
   expect(b()).toEqual(0);
   expect(c()).toEqual(0);
-
-  a(10);
 
   expect(a()).toEqual(10);
   expect(b()).toEqual(20);
@@ -20,11 +18,11 @@ test("observable + computed", () => {
 });
 
 test("computed as derived", () => {
-  let ko = Scope();
+  let co = ObservableContext();
 
-  let a = ko.observable(0);
-  let b = ko.computed(() => a() * 2);
-  let c = ko.computed(() => a() + b());
+  let a = co.observable(0);
+  let b = co.computed(() => a() * 2);
+  let c = co.computed(() => a() + b());
 
   expect(a()).toEqual(0);
   expect(b()).toEqual(0);
@@ -43,11 +41,11 @@ test("computed as derived", () => {
 });
 
 test("observe + watch", () => {
-  let ko = Scope();
+  let co = ObservableContext();
   let et = new EventTarget();
 
   let source = 0;
-  let a = ko.observe(
+  let a = co.observe(
     (cb) => {
       et.addEventListener("update", cb);
       return () => et.removeEventListener("update", cb);
@@ -59,13 +57,13 @@ test("observe + watch", () => {
 
   let received;
   let cleared = 0;
-  let b = ko.watch(() => {
+  let b = co.watch(() => {
     received = a();
     return () => {
       cleared++;
     };
   });
-  let c = ko.computed(() => a());
+  let c = co.computed(() => a());
 
   expect(received).toEqual(0);
 
@@ -87,7 +85,7 @@ test("observe + watch", () => {
   expect(c()).toEqual(100);
   expect(cleared).toEqual(2);
 
-  ko.dispose();
+  co.dispose();
 
   source = 200;
   et.dispatchEvent(new Event("update"));
