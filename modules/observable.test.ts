@@ -12,6 +12,8 @@ test("observable + computed", () => {
   expect(b()).toEqual(0);
   expect(c()).toEqual(0);
 
+  a(10);
+
   expect(a()).toEqual(10);
   expect(b()).toEqual(20);
   expect(c()).toEqual(30);
@@ -46,11 +48,11 @@ test("observe + watch", () => {
 
   let source = 0;
   let a = co.observe(
+    () => source,
     (cb) => {
       et.addEventListener("update", cb);
       return () => et.removeEventListener("update", cb);
     },
-    () => source,
   );
 
   expect(a()).toEqual(0);
@@ -94,4 +96,12 @@ test("observe + watch", () => {
   expect(received).toEqual(13);
   expect(c()).toEqual(100);
   expect(cleared).toEqual(2);
+});
+
+test("prevent write during read", () => {
+  let co = ObservableContext();
+
+  let a = co.observable(0);
+  expect(() => co.computed(() => a(123))).toThrow(/prohibited/);
+  expect(() => co.watch(() => a(123))).toThrow(/prohibited/);
 });

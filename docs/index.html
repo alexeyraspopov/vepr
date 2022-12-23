@@ -38,7 +38,7 @@
       and discussions.
     </p>
 
-    <canvas id="horizontalBar"></canvas>
+    <div class="canvas-container" id="horizontalBar"></div>
     <script type="module">
       import { blueprint, render, barX, identity } from "../modules";
 
@@ -54,10 +54,11 @@
           ),
         ],
       });
-      render(bp, window.horizontalBar);
+      let ctl = render(bp, window.horizontalBar);
+      window.addEventListener("beforeunload", () => ctl.remove(), { capture: true });
     </script>
 
-    <canvas id="verticalBar"></canvas>
+    <div class="canvas-container" id="verticalBar"></div>
     <script type="module">
       import { blueprint, render, barY, identity } from "../modules";
 
@@ -75,17 +76,19 @@
           ),
         ],
       });
-      render(bp, window.verticalBar);
+      let ctl = render(bp, window.verticalBar);
+      window.addEventListener("beforeunload", () => ctl.remove(), { capture: true });
     </script>
 
-    <canvas id="dot"></canvas>
+    <div class="canvas-container" id="dot"></div>
     <script type="module">
       import { blueprint, render, dot, identity } from "../modules";
 
       let rand = (max) => Math.random() * max;
-      let dotted = Array.from({ length: 100 }, () => ({ a: rand(10), b: rand(10) }));
+      let dotted = Array.from({ length: 500 }, () => ({ a: rand(10), b: rand(10) }));
       let bp = blueprint({ marks: [dot(dotted, identity({ x: "a", y: "b" }))] });
-      render(bp, window.dot);
+      let ctl = render(bp, window.dot);
+      window.addEventListener("beforeunload", () => ctl.remove(), { capture: true });
     </script>
 
     <footer><p>ISC License &copy; 2022 Alexey Raspopov</p></footer>

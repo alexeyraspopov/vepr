@@ -51,7 +51,7 @@ export function barY(data, encodings) {
         attrs: {
           x: "x(0)",
           y: "y(d.y)",
-          width: `x(d.x)`,
+          width: `x(d.x) - x(0)`,
           height: `y(${ord.bandwidth()}) - y(0)`,
           fill: "'currentColor'",
         },

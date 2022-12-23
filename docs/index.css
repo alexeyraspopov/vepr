@@ -24,10 +24,9 @@ a {
 a:hover {
   border-bottom: none;
 }
-canvas {
-  width: 100%;
-  border: 1px solid;
+.canvas-container {
+  position: relative;
+  outline: 1px solid;
   margin: 1em 0;
-  display: block;
   aspect-ratio: 5 / 3;
 }

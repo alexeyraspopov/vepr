@@ -2,6 +2,27 @@ const PROVIDER = 0b001;
 const CONSUMER = 0b010;
 const DISPOSER = 0b100;
 
+/** @typedef {ReturnType<typeof ObservableContext>} ObservableContext */
+/**
+ * @template T
+ * @typedef {(() => T) & ((value: T) => void)} Observable
+ */
+
+/**
+ * Creates isolated scope of observable values and its consumers.
+ *
+ * @example
+ *   let co = ObservableContext();
+ *   let counter = co.observable(0);
+ *   let double = co.computed(() => counter() * 2);
+ *
+ *   let dispose = co.watch(() => {
+ *     let value = double();
+ *     console.log(value);
+ *   });
+ *
+ *   counter(counter() + 1); // prints 2 in the console
+ */
 export function ObservableContext() {
   let head = { prev: null, next: null };
   let tail = { prev: null, next: null };
@@ -14,16 +35,17 @@ export function ObservableContext() {
    * Provide an observable that reads from external source
    *
    * @template T
-   * @param {(cb: () => void) => () => void} subscribe
    * @param {() => T} get
+   * @param {(cb: () => void) => () => void} subscribe
+   * @param {(a: T, b: T) => boolean} [equals=Object.is] Default is `Object.is`
    * @returns {() => T}
    */
-  function observe(subscribe, get) {
+  function observe(get, subscribe, equals = Object.is) {
     let value = get();
 
     let clear = subscribe(() => {
       let val = get();
-      let changed = !Object.is(val, value);
+      let changed = !equals(val, value);
       value = val;
       if (changed) {
         marked = [node];
@@ -53,9 +75,10 @@ export function ObservableContext() {
    *
    * @template T
    * @param {T} value
-   * @returns {(() => T) & ((value: T) => void)}
+   * @param {(a: T, b: T) => boolean} [equals=Object.is] Default is `Object.is`
+   * @returns {Observable<T>}
    */
-  function observable(value) {
+  function observable(value, equals = Object.is) {
     let node = { flag: PROVIDER, prev: tail.prev, next: tail };
     tail.prev = tail.prev.next = node;
 
@@ -65,7 +88,7 @@ export function ObservableContext() {
         return value;
       } else {
         if (tracked != null || marked != null) throw new Error("write while read is prohibited");
-        let changed = !Object.is(val, value);
+        let changed = !equals(val, value);
         value = val;
         if (changed) {
           marked = [node];
@@ -79,15 +102,16 @@ export function ObservableContext() {
    * Computed value that also works as derived atom
    *
    * @template T
-   * @param {() => T} fn
-   * @returns {(() => T) & ((value: T) => void)}
+   * @param {() => T} get
+   * @param {(a: T, b: T) => boolean} [equals=Object.is] Default is `Object.is`
+   * @returns {Observable<T>}
    */
-  function computed(fn) {
+  function computed(get, equals = Object.is) {
     tracked = new WeakSet();
-    let value = fn();
+    let value = get();
     let update = () => {
-      let val = fn();
-      let changed = !Object.is(val, value);
+      let val = get();
+      let changed = !equals(val, value);
       value = val;
       if (changed) {
         marked.push(node);
@@ -103,7 +127,7 @@ export function ObservableContext() {
         return value;
       } else {
         if (tracked != null || marked != null) throw new Error("write while read is prohibited");
-        let changed = !Object.is(val, value);
+        let changed = !equals(val, value);
         value = val;
         if (changed) {
           marked = [node];
@@ -116,8 +140,8 @@ export function ObservableContext() {
   /**
    * Observable watcher for side effects
    *
-   * @param {() => (void | () => void)} fn
-   * @returns {() => void}
+   * @param {() => (() => void) | void)} fn
+   * @returns {() => void} A function to cleanup and dispose the watcher
    */
   function watch(fn) {
     tracked = new WeakSet();
@@ -152,7 +176,7 @@ export function ObservableContext() {
   /**
    * Clean up the context
    *
-   * @returns {() => void}
+   * @returns {void}
    */
   function dispose() {
     let cursor = head;

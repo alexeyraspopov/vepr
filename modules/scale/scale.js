@@ -169,6 +169,7 @@ const PERC = /^[\d\.]+%$/;
  * @param {number} [padding=0] Default is `0`
  * @param {number} [gap=0] Default is `0`
  * @param {number} [u=1] Default is `1`
+ * @returns {(start: number, span?: number) => [number, number]}
  */
 export function Track(template, length, padding = 0, gap = 0, u = 1) {
   let n = template.length;
