@@ -1,5 +1,14 @@
-import { ObservableContext } from "./observable.js";
+import { ObservableScope } from "./observable.js";
 import { Linear, Track } from "./scale/scale.js";
+import { renderDot } from "./mark/dot.js";
+import { renderBar } from "./mark/bar.js";
+import { renderLine } from "./mark/line.js";
+
+let renderFn = new Map([
+  ["dot", renderDot],
+  ["bar", renderBar],
+  ["line", renderLine],
+]);
 
 /**
  * Render a visualization blueprint using Canvas
@@ -8,92 +17,60 @@ import { Linear, Track } from "./scale/scale.js";
  * @param {HTMLElement} container HTML element to render to
  */
 export function render(blueprint, container) {
-  let co = ObservableContext();
+  let os = ObservableScope();
+  let bp = os.observable(blueprint);
   let canvas = createCanvas(container);
-  let size = observeElementSize(co, container);
-  let currentColor = observeCurrentColor(co, container);
-  let devicePixelRatio = observeDevicePixelRatio(co);
+  let size = observeElementSize(os, container);
+  let currentColor = observeCurrentColor(os, container);
+  let devicePixelRatio = observeDevicePixelRatio(os);
 
-  let scale = co.computed(() => {
+  // Real canvas element size in dom is different from the drawing canvas available
+  // The drawing canvas needs to be readjusted accordingly to the size available,
+  // device pixel ratio and additional scaling factor for better image quality.
+  let scale = os.computed(() => {
     let { width, height } = size();
     let dpr = devicePixelRatio();
     return scaleCanvasArea(width, height, dpr);
   }, shallowObjectEqual);
 
-  let layers = co.computed(() => {
-    return blueprint.layers.map((layer) => {
-      let shapes = layer.shapes.map((shape) => {
-        let pairs = Object.keys(shape.attrs).map((key) => `${key}: ${shape.attrs[key]}`);
-        let attrs = new Function("x", "y", "d", `return { ${pairs.join(",")} }`);
-        let render = getShapeByTag(shape.tag);
-        return { attrs, render };
-      });
-      let channels = layer.channels;
-      let key = layer.key;
-      return { key, shapes, channels };
-    });
-  });
-
-  let context = co.computed(() => {
-    // Real canvas element size in dom is different from the drawing canvas available
-    // The drawing canvas needs to be readjusted accordingly to the size available,
-    // device pixel ratio and additional scaling factor for better image quality.
+  let context = os.computed(() => {
     let { width, height, ratio } = scale();
-    let tries = 0;
-    let ctx;
-    do {
-      releaseCanvas(canvas);
-      ctx = canvas.getContext("2d", { desynchronized: true });
-      canvas.width = width;
-      canvas.height = height;
-      canvas.style.width = "100%";
-      canvas.style.height = "100%";
-      // https://bugs.webkit.org/show_bug.cgi?id=195325
-      // Canvas context can be null in Webkit. Doing our best to recover
-    } while (ctx == null || ++tries < 2);
-    ctx.scale(ratio, ratio);
-    return ctx;
+    return acquireCanvasContext(canvas, width, height, ratio);
   });
 
-  co.watch(() => {
+  os.watch(() => {
     // HACK canvas only picks up currentColor if defined via style attribute
     canvas.style.color = currentColor();
-    let ctx = context();
 
+    let ctx = context();
     let { width, height } = size();
 
-    let trackX = Track(["40u", "1f"], width, 25, 2);
-    let trackY = Track(["1f", "40u"], height, 10, 2);
-    // positional scales needs to be define per layer,
-    // since different layers may pick different slots
-    let x = Linear([0, 2 ** 16], trackX(1, 1));
-    let y = Linear([0, 2 ** 16], trackY(0, 1));
+    let trackX = Track(["40u", "1f"], width, 20, 4);
+    let trackY = Track(["1f", "40u"], height, 10, 4);
+
     // let color = either sequential or ordinal?
+    let areas = {
+      main: { x: Linear([0, 2 ** 16], trackX(1, 1)), y: Linear([0, 2 ** 16], trackY(0, 1)) },
+      haxis: { x: Linear([0, 2 ** 16], trackX(1, 1)), y: Linear([0, 2 ** 16], trackY(1, 1)) },
+      vaxis: { x: Linear([0, 2 ** 16], trackX(0, 1)), y: Linear([0, 2 ** 16], trackY(0, 1)) },
+    };
 
-    let cursor;
-    let channels;
-    let reader = new Proxy(Object.prototype, {
-      get(_, key) {
-        if (key in channels) return channels[key][cursor];
-        else throw new Error("Unable to find channel " + key);
-      },
-    });
+    let { layout } = bp();
 
-    let ref = requestAnimationFrame(() => {
+    let id = Math.random().toString(32).slice(2, 8);
+    let ref = requestAnimationFrame(async () => {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-      for (let layer of layers()) {
-        let shapes = layer.shapes;
-        channels = layer.channels;
+      for (let area in layout) {
+        let scales = areas[area];
+        let layers = layout[area];
+        for (let layer of layers) {
+          let render = renderFn.get(layer.key);
 
-        ctx.save();
-        for (let pointer of layer.channels.index) {
-          cursor = pointer;
-          for (let shape of shapes) {
-            shape.render(ctx, shape.attrs(x, y, reader));
-          }
+          ctx.save();
+          render(ctx, scales, layer.channels);
+          ctx.restore();
         }
-        ctx.restore();
       }
     });
     return () => {
@@ -101,21 +78,27 @@ export function render(blueprint, container) {
     };
   });
 
-  function remove() {
-    releaseCanvas(canvas);
-    target.remove();
-    target = null;
+  /** @param {Blueprint} blueprint */
+  function update(blueprint) {
+    bp(blueprint);
   }
 
-  return { remove };
+  function remove() {
+    releaseCanvas(canvas);
+    canvas.remove();
+    canvas = null;
+    os.dispose();
+  }
+
+  return { update, remove };
 }
 
 /**
- * @param {ObservableContext} co
+ * @param {ObservableScope} os
  * @param {HTMLElement} target
  */
-function observeElementSize(co, target) {
-  return co.observe(
+function observeElementSize(os, target) {
+  return os.observe(
     () => {
       let rect = target.getBoundingClientRect();
       return { width: rect.width, height: rect.height };
@@ -129,9 +112,9 @@ function observeElementSize(co, target) {
   );
 }
 
-/** @param {ObservableContext} co */
-function observeDevicePixelRatio(co) {
-  return co.observe(
+/** @param {ObservableScope} os */
+function observeDevicePixelRatio(os) {
+  return os.observe(
     () => window.devicePixelRatio,
     (cb) => {
       let media = window.matchMedia(`(resolution: ${window.devicePixelRatio}dppx)`);
@@ -142,11 +125,11 @@ function observeDevicePixelRatio(co) {
 }
 
 /**
- * @param {ObservableContext} co
+ * @param {ObservableScope} os
  * @param {HTMLElement} target
  */
-function observeCurrentColor(co, target) {
-  return co.observe(
+function observeCurrentColor(os, target) {
+  return os.observe(
     () => getComputedStyle(target).getPropertyValue("color"),
     (cb) => {
       let media = window.matchMedia("(prefers-color-scheme: dark)");
@@ -185,6 +168,8 @@ function scaleCanvasArea(width, height, dpr) {
 function createCanvas(container) {
   let canvas = document.createElement("canvas");
   canvas.style.display = "block";
+  canvas.style.position = "absolute";
+  canvas.style.top = 0;
   container.append(canvas);
   return canvas;
 }
@@ -207,6 +192,30 @@ function releaseCanvas(target) {
 }
 
 /**
+ * @param {HTMLCanvasElement} canvas
+ * @param {number} width
+ * @param {number} height
+ * @param {number} ratio
+ */
+function acquireCanvasContext(canvas, width, height, ratio) {
+  let tries = 0;
+  let ctx;
+  do {
+    releaseCanvas(canvas);
+    ctx = canvas.getContext("2d", { desynchronized: true });
+    canvas.width = width;
+    canvas.height = height;
+    canvas.style.width = "100%";
+    canvas.style.height = "100%";
+    canvas.style.transform = "translateZ(0) scale(1)";
+    // https://bugs.webkit.org/show_bug.cgi?id=195325
+    // Canvas context can be null in Webkit. Doing our best to recover
+  } while (ctx == null || ++tries < 2);
+  ctx.scale(ratio, ratio);
+  return ctx;
+}
+
+/**
  * @template [T=object] Default is `object`
  * @param {T} a
  * @param {T} b
@@ -215,27 +224,4 @@ function releaseCanvas(target) {
 function shallowObjectEqual(a, b) {
   for (let k in a) if (!Object.is(a[k], b[k])) return false;
   return true;
-}
-
-function getShapeByTag(tag) {
-  switch (tag) {
-    case "circle":
-      return circle;
-    case "rect":
-      return rect;
-    default:
-      return Function.prototype;
-  }
-}
-
-function circle(ctx, attrs) {
-  ctx.beginPath();
-  ctx.arc(attrs.cx, attrs.cy, attrs.r, 0, 2 * Math.PI, false);
-  ctx.strokeStyle = attrs.stroke;
-  ctx.stroke();
-}
-
-function rect(ctx, attrs) {
-  ctx.fillStyle = attrs.fill;
-  ctx.fillRect(attrs.x, attrs.y, attrs.width, attrs.height);
 }

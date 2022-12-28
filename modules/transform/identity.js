@@ -7,9 +7,6 @@ export function identity(encodings) {
       return extent(data, (datum) => datum[key]);
     },
     ...encodings,
-    vectors: {
-      x: { domain: null, values: null },
-    },
     *values(data, key) {
       for (let datum of data) yield datum[key];
     },

@@ -1,5 +1,6 @@
 export { dot } from "./mark/dot.js";
 export { barX, barY } from "./mark/bar.js";
+export { lineX, lineY } from "./mark/line.js"; // TODO line() only
 
 export { identity } from "./transform/identity.js";
 

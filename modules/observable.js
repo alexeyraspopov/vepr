@@ -2,7 +2,7 @@ const PROVIDER = 0b001;
 const CONSUMER = 0b010;
 const DISPOSER = 0b100;
 
-/** @typedef {ReturnType<typeof ObservableContext>} ObservableContext */
+/** @typedef {ReturnType<typeof ObservableScope>} ObservableScope */
 /**
  * @template T
  * @typedef {(() => T) & ((value: T) => void)} Observable
@@ -12,18 +12,18 @@ const DISPOSER = 0b100;
  * Creates isolated scope of observable values and its consumers.
  *
  * @example
- *   let co = ObservableContext();
- *   let counter = co.observable(0);
- *   let double = co.computed(() => counter() * 2);
+ *   let os = ObservableScope();
+ *   let counter = os.observable(0);
+ *   let double = os.computed(() => counter() * 2);
  *
- *   let dispose = co.watch(() => {
+ *   let dispose = os.watch(() => {
  *     let value = double();
  *     console.log(value);
  *   });
  *
  *   counter(counter() + 1); // prints 2 in the console
  */
-export function ObservableContext() {
+export function ObservableScope() {
   let head = { prev: null, next: null };
   let tail = { prev: null, next: null };
   (head.next = tail).prev = head;

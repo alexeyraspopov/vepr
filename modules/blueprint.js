@@ -16,6 +16,8 @@
  * @returns {Blueprint}
  */
 export function blueprint(options) {
-  let layers = options.marks;
-  return { layers };
+  let layout = {
+    main: options.marks,
+  };
+  return { layout };
 }

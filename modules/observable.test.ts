@@ -1,12 +1,12 @@
 import { test, expect } from "vitest";
-import { ObservableContext } from "./observable";
+import { ObservableScope } from "./observable";
 
 test("observable + computed", () => {
-  let co = ObservableContext();
+  let os = ObservableScope();
 
-  let a = co.observable(0);
-  let b = co.computed(() => a() * 2);
-  let c = co.computed(() => a() + b());
+  let a = os.observable(0);
+  let b = os.computed(() => a() * 2);
+  let c = os.computed(() => a() + b());
 
   expect(a()).toEqual(0);
   expect(b()).toEqual(0);
@@ -20,11 +20,11 @@ test("observable + computed", () => {
 });
 
 test("computed as derived", () => {
-  let co = ObservableContext();
+  let os = ObservableScope();
 
-  let a = co.observable(0);
-  let b = co.computed(() => a() * 2);
-  let c = co.computed(() => a() + b());
+  let a = os.observable(0);
+  let b = os.computed(() => a() * 2);
+  let c = os.computed(() => a() + b());
 
   expect(a()).toEqual(0);
   expect(b()).toEqual(0);
@@ -43,11 +43,11 @@ test("computed as derived", () => {
 });
 
 test("observe + watch", () => {
-  let co = ObservableContext();
+  let os = ObservableScope();
   let et = new EventTarget();
 
   let source = 0;
-  let a = co.observe(
+  let a = os.observe(
     () => source,
     (cb) => {
       et.addEventListener("update", cb);
@@ -59,13 +59,13 @@ test("observe + watch", () => {
 
   let received;
   let cleared = 0;
-  let b = co.watch(() => {
+  let b = os.watch(() => {
     received = a();
     return () => {
       cleared++;
     };
   });
-  let c = co.computed(() => a());
+  let c = os.computed(() => a());
 
   expect(received).toEqual(0);
 
@@ -87,7 +87,7 @@ test("observe + watch", () => {
   expect(c()).toEqual(100);
   expect(cleared).toEqual(2);
 
-  co.dispose();
+  os.dispose();
 
   source = 200;
   et.dispatchEvent(new Event("update"));
@@ -99,9 +99,11 @@ test("observe + watch", () => {
 });
 
 test("prevent write during read", () => {
-  let co = ObservableContext();
+  let os = ObservableScope();
 
-  let a = co.observable(0);
-  expect(() => co.computed(() => a(123))).toThrow(/prohibited/);
-  expect(() => co.watch(() => a(123))).toThrow(/prohibited/);
+  let a = os.observable(0);
+  let b = os.computed(() => a() * 2);
+  expect(() => os.computed(() => a(123))).toThrow(/prohibited/);
+  expect(() => os.watch(() => a(123))).toThrow(/prohibited/);
+  expect(() => os.watch(() => b(123))).toThrow(/prohibited/);
 });

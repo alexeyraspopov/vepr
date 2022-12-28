@@ -82,13 +82,56 @@
     </script>
 
     <div class="canvas-container" id="dot"></div>
+    <input type="range" value="100" min="10" max="10000" step="1" id="dnum" />
     <script type="module">
       import { blueprint, render, dot, identity } from "../modules";
 
       let rand = (max) => Math.random() * max;
-      let dotted = Array.from({ length: 500 }, () => ({ a: rand(10), b: rand(10) }));
+      let dataset = Array.from({ length: 1_000_000 }, () => ({ a: rand(10), b: rand(10) }));
+      let dotted = dataset.slice(0, 100);
       let bp = blueprint({ marks: [dot(dotted, identity({ x: "a", y: "b" }))] });
       let ctl = render(bp, window.dot);
+
+      window.dnum.addEventListener("input", (event) => {
+        let n = parseInt(event.target.value, 10);
+        let dotted = dataset.slice(0, n);
+        let bp = blueprint({ marks: [dot(dotted, identity({ x: "a", y: "b" }))] });
+        ctl.update(bp);
+      });
+
+      window.addEventListener("beforeunload", () => ctl.remove(), { capture: true });
+    </script>
+
+    <div class="canvas-container" id="line"></div>
+    <input type="range" value="100" min="10" max="10000" step="1" id="lnum" />
+    <style>
+      input[type="range"] {
+        width: 400px;
+      }
+      input[type="range"]::-webkit-slider-container {
+        background: currentColor;
+      }
+    </style>
+    <script type="module">
+      import { blueprint, render, lineX, identity } from "../modules";
+
+      let rand = (max) => Math.random() * max;
+      let dataset = Array.from({ length: 20_000 }, () => ({ a: rand(1000), b: rand(1000) }));
+      let dotted = dataset.slice(0, 100);
+      let bp = blueprint({
+        marks: [lineX(dotted, identity({ domain: { y: [0, 1000] }, y: "b" }))],
+      });
+      let ctl = render(bp, window.line);
+
+      window.lnum.addEventListener("input", (event) => {
+        let n = parseInt(event.target.value, 10);
+        let dotted = dataset.slice(0, n);
+        let bp = blueprint({
+          marks: [lineX(dotted, identity({ domain: { y: [0, 1000] }, y: "b" }))],
+        });
+        ctl.update(bp);
+      });
+
       window.addEventListener("beforeunload", () => ctl.remove(), { capture: true });
     </script>
 
