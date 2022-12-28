@@ -143,19 +143,19 @@ function observeCurrentColor(os, target) {
  * @param {number} width
  * @param {number} height
  * @param {number} dpr
+ * @param {number} [k=1] Additional scale factor that increases image quality by further expanding
+ *   canvas area. Default is `1`
  */
-function scaleCanvasArea(width, height, dpr) {
+function scaleCanvasArea(width, height, dpr, k = 1) {
   let maxCanvasArea = 2 ** 24; // iOS can't handle more
-  let scaleFactor, ratio, rwidth, rheight;
+  let ratio, rwidth, rheight;
 
   // reduce scale factor until the canvas fits the limits
-  // start with 3 for iOS, 4 for any other retina, 2 for old displays
-  scaleFactor = dpr > 1 ? 6 - dpr : 2;
   do {
-    ratio = dpr * scaleFactor;
+    ratio = dpr * k;
     rwidth = (width * ratio) | 0;
     rheight = (height * ratio) | 0;
-  } while (rwidth * rheight > maxCanvasArea && --scaleFactor > 1);
+  } while (rwidth * rheight > maxCanvasArea && --k > 1);
 
   return { width: rwidth, height: rheight, ratio };
 }
