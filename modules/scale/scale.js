@@ -1,4 +1,4 @@
-import { bisect, identity, rank } from "./array.js";
+import { ascending, bisect, identity, rank } from "./array.js";
 import { quantileSorted } from "./quantile.js";
 
 /**
@@ -14,6 +14,20 @@ export function Sequential(domain, interpolator, transform = identity) {
   let [x0, x1] = Array.from(domain, transform);
   let k = +x1 - +x0;
   let normalize = k === 0 ? (x) => 0.5 : (x) => (x - +x0) / k;
+  return (x) => interpolator(normalize(transform(x)));
+}
+
+/**
+ * @template Result
+ * @template [Domain=number | Date] Default is `number | Date`
+ * @param {Domain[]} domain
+ * @param {(value: number) => Result} interpolator
+ * @param {(value: Domain) => Domain} [transform=identity] Default is `identity`
+ * @returns {(value: Domain) => Result}
+ */
+export function SequentialQuantile(domain, interpolator, transform = identity) {
+  let sorted = Array.from(domain, transform).sort(ascending);
+  let normalize = (x) => (bisect(sorted, x, 1) - 1) / (sorted.length - 1);
   return (x) => interpolator(normalize(transform(x)));
 }
 

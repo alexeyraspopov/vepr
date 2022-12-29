@@ -10,6 +10,7 @@ import {
   Quantize,
   Diverging,
   Track,
+  SequentialQuantile,
 } from "./scale.js";
 import { log, pow, symlog } from "./number.js";
 import { linearTicks } from "./array.js";
@@ -110,6 +111,11 @@ test("quantile", () => {
   expect([8, 8.9].map((v) => scaleB(v))).toEqual([1, 1]);
   expect([9, 9.1, 10, 13].map((v) => scaleB(v))).toEqual([2, 2, 2, 2]);
   expect([14.9, 15, 15.1, 16, 20].map((v) => scaleB(v))).toEqual([3, 3, 3, 3, 3]);
+});
+
+test("sequential quantile", () => {
+  let scale = SequentialQuantile([100, 1, 13], (v) => v);
+  expect([1, 2, 13, 20, 99.99, 100].map((v) => scale(v))).toEqual([0, 0, 0.5, 0.5, 0.5, 1]);
 });
 
 test("quantize", () => {
