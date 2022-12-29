@@ -1,3 +1,4 @@
+import { markStart, markFinish } from "./profiling.js";
 /**
  * A serializable representation of a data visualization
  *
@@ -16,8 +17,13 @@
  * @returns {Blueprint}
  */
 export function blueprint(options) {
+  markStart("blueprint");
+
   let layout = {
     main: options.marks,
   };
+
+  markFinish("blueprint");
+
   return { layout };
 }

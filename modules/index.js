@@ -23,3 +23,5 @@ export {
   Point,
 } from "./scale/scale.js";
 export { pow, log, symlog } from "./scale/number.js";
+
+export { toggleProfiling } from "./profiling.js";

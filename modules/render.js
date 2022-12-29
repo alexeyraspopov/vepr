@@ -1,5 +1,6 @@
 import { ObservableScope } from "./observable.js";
 import { Linear, Track } from "./scale/scale.js";
+import { markStart, markFinish } from "./profiling.js";
 import { renderDot } from "./mark/dot.js";
 import { renderBar } from "./mark/bar.js";
 import { renderLine } from "./mark/line.js";
@@ -57,8 +58,9 @@ export function render(blueprint, container) {
 
     let { layout } = bp();
 
-    let id = Math.random().toString(32).slice(2, 8);
     let ref = requestAnimationFrame(async () => {
+      markStart("render");
+
       ctx.clearRect(0, 0, canvas.width, canvas.height);
 
       for (let area in layout) {
@@ -72,6 +74,8 @@ export function render(blueprint, container) {
           ctx.restore();
         }
       }
+
+      markFinish("render");
     });
     return () => {
       cancelAnimationFrame(ref);
