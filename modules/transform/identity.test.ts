@@ -1,6 +1,6 @@
 import { test, expect } from "vitest";
 import { descending } from "../scale/array.js";
-import { identity_new as identity } from "./identity.js";
+import { identity } from "./identity.js";
 
 test("identity transform", () => {
   type Datum = { name: string; age: number };

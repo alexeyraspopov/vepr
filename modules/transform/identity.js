@@ -17,7 +17,7 @@ export function identity(encodings, options = {}) {
    * @param {T[]} data
    * @param {Record<K, string>} defaults
    */
-  return function identity(data, defaults) {
+  return function identity(data, defaults = {}) {
     let index = Uint32Array.from(data, (_, i) => i);
     let bitset = Uint32Array.from({ length: Math.ceil(data.length / 32) });
     if ("filter" in options) {

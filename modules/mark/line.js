@@ -3,7 +3,7 @@ import { Linear } from "../scale/scale.js";
 
 export function line(data, process) {
   function variables() {
-    let vectors = process(data, { x: "", y: "" });
+    let vectors = process(data);
     let variables = {
       x: { type: "q", domain: extent(vectors.x) },
       y: { type: "q", domain: extent(vectors.y) },
