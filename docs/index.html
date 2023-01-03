@@ -5,14 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <link rel="icon" href="./favicon.ico" />
     <link rel="stylesheet" type="text/css" href="./index.css" />
-    <script>
-      window.basicDataset = [
-        { key: "a", value: 13 },
-        { key: "b", value: 20 },
-        { key: "c", value: 10 },
-        { key: "d", value: 5 },
-      ];
-    </script>
     <script type="module">
       import { toggleProfiling } from "../modules";
       toggleProfiling(true);
@@ -43,100 +35,40 @@
       and discussions.
     </p>
 
-    <div class="canvas-container" id="horizontalBar"></div>
-    <script type="module">
-      import { blueprint, render, barX, identity } from "../modules";
-
-      let bp = blueprint({
-        marks: [
-          barX(
-            window.basicDataset,
-            identity({
-              domain: { y: [0, 25] },
-              x: "key",
-              y: "value",
-            }),
-          ),
-        ],
-      });
-      let ctl = render(bp, window.horizontalBar);
-      window.addEventListener("beforeunload", () => ctl.remove(), { capture: true });
-    </script>
-
-    <div class="canvas-container" id="verticalBar"></div>
-    <script type="module">
-      import { blueprint, render, barY, identity } from "../modules";
-
-      let bp = blueprint({
-        marks: [
-          barY(
-            window.basicDataset,
-            identity({
-              // domain selection should be a part of transform(encodings)
-              domain: { x: [0, 25] },
-              // should this be just "ordinal"/"cont" to avoid x/y confusion? how observable resolves it?
-              y: "key",
-              x: "value",
-            }),
-          ),
-        ],
-      });
-      let ctl = render(bp, window.verticalBar);
-      window.addEventListener("beforeunload", () => ctl.remove(), { capture: true });
-    </script>
-
     <div class="canvas-container" id="dot"></div>
-    <input type="range" value="100" min="10" max="10000" step="1" id="dnum" />
     <script type="module">
-      import { blueprint, render, dot, identity } from "../modules";
-
-      let rand = (max) => Math.random() * max;
-      let dataset = Array.from({ length: 1_000_000 }, () => ({ a: rand(10), b: rand(10) }));
-      let dotted = dataset.slice(0, 100);
-      let bp = blueprint({ marks: [dot(dotted, identity({ x: "a", y: "b" }))] });
-      let ctl = render(bp, window.dot);
-
-      window.dnum.addEventListener("input", (event) => {
-        let n = parseInt(event.target.value, 10);
-        let dotted = dataset.slice(0, n);
-        let bp = blueprint({ marks: [dot(dotted, identity({ x: "a", y: "b" }))] });
-        ctl.update(bp);
+      import { lifecycle, sampleDotPlot } from "./index.ts";
+      lifecycle(() => {
+        let ctl = sampleDotPlot(window.dot);
+        return () => ctl.remove();
       });
-
-      window.addEventListener("beforeunload", () => ctl.remove(), { capture: true });
     </script>
 
     <div class="canvas-container" id="line"></div>
-    <input type="range" value="100" min="10" max="10000" step="1" id="lnum" />
-    <style>
-      input[type="range"] {
-        width: 400px;
-      }
-      input[type="range"]::-webkit-slider-container {
-        background: currentColor;
-      }
-    </style>
     <script type="module">
-      import { blueprint, render, lineX, identity } from "../modules";
-
-      let rand = (max) => Math.random() * max;
-      let dataset = Array.from({ length: 20_000 }, () => ({ a: rand(1000), b: rand(1000) }));
-      let dotted = dataset.slice(0, 100);
-      let bp = blueprint({
-        marks: [lineX(dotted, identity({ domain: { y: [0, 1000] }, y: "b" }))],
+      import { lifecycle, sampleLinePlot } from "./index.ts";
+      lifecycle(() => {
+        let ctl = sampleLinePlot(window.line);
+        return () => ctl.remove();
       });
-      let ctl = render(bp, window.line);
+    </script>
 
-      window.lnum.addEventListener("input", (event) => {
-        let n = parseInt(event.target.value, 10);
-        let dotted = dataset.slice(0, n);
-        let bp = blueprint({
-          marks: [lineX(dotted, identity({ domain: { y: [0, 1000] }, y: "b" }))],
-        });
-        ctl.update(bp);
+    <div class="canvas-container" id="barY"></div>
+    <script type="module">
+      import { lifecycle, sampleBarPlot } from "./index.ts";
+      lifecycle(() => {
+        let ctl = sampleBarPlot(window.barY, "y");
+        return () => ctl.remove();
       });
+    </script>
 
-      window.addEventListener("beforeunload", () => ctl.remove(), { capture: true });
+    <div class="canvas-container" id="barX"></div>
+    <script type="module">
+      import { lifecycle, sampleBarPlot } from "./index.ts";
+      lifecycle(() => {
+        let ctl = sampleBarPlot(window.barX, "x");
+        return () => ctl.remove();
+      });
     </script>
 
     <footer><p>ISC License &copy; 2022 Alexey Raspopov</p></footer>

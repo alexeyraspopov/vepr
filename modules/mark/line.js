@@ -1,32 +1,36 @@
 import { extent } from "../scale/array.js";
 import { Linear } from "../scale/scale.js";
 
-export function lineX(data, encodings) {
-  let hdomain = extent(data, (datum, index) => index);
-  let h = Linear(hdomain, [0, 2 ** 16]);
-  let vdomain = encodings.domain.y; //extent(data, (datum) => datum[encodings.y]);
-  let v = Linear(vdomain, [2 ** 16, 0]);
-  return {
-    key: "line",
-    channels: {
-      index: Uint32Array.from(data, (_, index) => index),
-      x: Float32Array.from(encodings.values(data, encodings.x), (_, i) => h(i)),
-      y: Float32Array.from(encodings.values(data, encodings.y), v),
-      w: 1.5,
-    },
-  };
-}
+export function line(data, process) {
+  function variables() {
+    let vectors = process(data, { x: "", y: "" });
+    let variables = {
+      x: { type: "q", domain: extent(vectors.x) },
+      y: { type: "q", domain: extent(vectors.y) },
+    };
+    return [vectors, variables];
+  }
 
-export function lineY(data, encodings) {
-  return {
-    key: "line",
-    channels: {
-      index: Uint32Array.from(data, (_, index) => index),
-      x: Float32Array.from([]),
-      y: Float32Array.from([]),
-      w: 1.5,
-    },
-  };
+  function channels(vectors, variables) {
+    let ScaleX = variables.x.type === "q" ? Linear : null;
+    let ScaleY = variables.y.type === "q" ? Linear : null;
+    let x = ScaleX(variables.x.domain, [0, 2 ** 16]);
+    let y = ScaleY(variables.y.domain, [2 ** 16, 0]);
+    let subset = vectors.index.filter(
+      (index) => vectors.bitset[index >> 5] & (0x80000000 >>> index),
+    );
+    return {
+      key: "line",
+      channels: {
+        index: subset,
+        x: Float64Array.from(vectors.index, (index) => x(vectors.x[index])),
+        y: Float64Array.from(vectors.index, (index) => y(vectors.y[index])),
+        w: 1.5,
+      },
+    };
+  }
+
+  return { variables, channels };
 }
 
 /** @param {CanvasRenderingContext2D} context */

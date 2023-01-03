@@ -4,11 +4,13 @@ import { markStart, markFinish } from "./profiling.js";
 import { renderDot } from "./mark/dot.js";
 import { renderBar } from "./mark/bar.js";
 import { renderLine } from "./mark/line.js";
+import { renderAxis } from "./legend/axis.js";
 
 let renderFn = new Map([
   ["dot", renderDot],
   ["bar", renderBar],
   ["line", renderLine],
+  ["axis", renderAxis],
 ]);
 
 /**
@@ -41,45 +43,43 @@ export function render(blueprint, container) {
 
   os.watch(() => {
     // HACK canvas only picks up currentColor if defined via style attribute
+    // re-render canvas if the color changes, so dark/light theme switch is supported
     canvas.style.color = currentColor();
 
     let ctx = context();
     let { width, height } = size();
 
-    let trackX = Track(["40u", "1f"], width, 20, 4);
-    let trackY = Track(["1f", "40u"], height, 10, 4);
+    let trackX = Track(["20u", "1f"], width, 20, 4);
+    let trackY = Track(["1f", "25u"], height, 10, 4);
 
-    // let color = either sequential or ordinal?
+    let { layout } = bp();
     let areas = {
       main: { x: Linear([0, 2 ** 16], trackX(1, 1)), y: Linear([0, 2 ** 16], trackY(0, 1)) },
       haxis: { x: Linear([0, 2 ** 16], trackX(1, 1)), y: Linear([0, 2 ** 16], trackY(1, 1)) },
       vaxis: { x: Linear([0, 2 ** 16], trackX(0, 1)), y: Linear([0, 2 ** 16], trackY(0, 1)) },
     };
 
-    let { layout } = bp();
+    let ctl = new AbortController();
 
-    let ref = requestAnimationFrame(async () => {
-      markStart("render");
+    markStart("render");
 
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-      for (let area in layout) {
-        let scales = areas[area];
-        let layers = layout[area];
-        for (let layer of layers) {
-          let render = renderFn.get(layer.key);
+    for (let area in layout) {
+      let scales = areas[area];
+      let layers = layout[area];
+      for (let layer of layers) {
+        let render = renderFn.get(layer.key);
 
-          ctx.save();
-          render(ctx, scales, layer.channels);
-          ctx.restore();
-        }
+        ctx.save();
+        render(ctx, scales, layer.channels);
+        ctx.restore();
       }
+    }
 
-      markFinish("render");
-    });
-    return () => {
-      cancelAnimationFrame(ref);
-    };
+    markFinish("render");
+
+    return () => ctl.abort();
   });
 
   /** @param {Blueprint} blueprint */
