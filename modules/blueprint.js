@@ -25,19 +25,17 @@ import { axisX, axisY } from "./legend/axis.js";
 export function blueprint(options) {
   markStart("blueprint");
 
-  let variableSets = options.marks.map((mark) => mark.variables());
-
-  let variables = variableSets.reduce(
-    (vars, set) => {
-      let localVars = set[1];
-      for (let key in localVars) {
+  let variables = options.marks.reduce(
+    (vars, mark) => {
+      let local = mark.next().value;
+      for (let key in local) {
         if (vars[key] == null) {
-          vars[key] = localVars[key];
+          vars[key] = local[key];
         } else {
-          if (vars[key].type === "q") {
+          if (vars[key].type === "numeral") {
             vars[key] = {
               ...vars[key],
-              domain: extent(vars[key].domain.concat(localVars[key].domain)),
+              domain: extent(vars[key].domain.concat(local[key].domain)),
             };
           }
         }
@@ -46,9 +44,8 @@ export function blueprint(options) {
     },
     { x: options.x, y: options.y },
   );
-  let channels = options.marks.map((mark, index) =>
-    mark.channels(variableSets[index][0], variables),
-  );
+
+  let channels = options.marks.map((mark) => mark.next(variables).value);
 
   let layout = { main: channels, haxis: [axisX(variables.x)], vaxis: [axisY(variables.y)] };
 

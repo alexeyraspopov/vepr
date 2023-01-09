@@ -3,11 +3,11 @@ import { Linear, Band } from "../scale/scale.js";
 
 export function axisX(variable) {
   let x, ticks;
-  if (variable.type === "q") {
+  if (variable.type === "numeral") {
     let [start, finish] = variable.domain;
     ticks = linearTicks(start, finish, 15);
     x = Linear(variable.domain, [0, 2 ** 16]);
-  } else if (variable.type === "o") {
+  } else if (variable.type === "ordinal") {
     ticks = variable.domain;
     let sx = Band(variable.domain, [0, 2 ** 16], 0.1, 0.1);
     x = (v) => sx(v) + sx.bandwidth() / 2;
@@ -27,11 +27,11 @@ export function axisX(variable) {
 
 export function axisY(variable) {
   let y, ticks;
-  if (variable.type === "q") {
+  if (variable.type === "numeral") {
     let [start, finish] = variable.domain;
     ticks = linearTicks(start, finish, 15);
     y = Linear(variable.domain, [2 ** 16, 0]);
-  } else if (variable.type === "o") {
+  } else if (variable.type === "ordinal") {
     ticks = variable.domain;
     let sy = Band(variable.domain, [2 ** 16, 0], 0.1, 0.1);
     y = (v) => sy(v) + sy.bandwidth() / 2;

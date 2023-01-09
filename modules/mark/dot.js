@@ -6,22 +6,14 @@ import { Linear } from "../scale/scale.js";
  *
  * @returns {Mark}
  */
-export function dot(data, process) {
-  function variables() {
-    let vectors = process(data);
-    let variables = {
-      x: { type: "q", domain: extent(vectors.x) },
-      y: { type: "q", domain: extent(vectors.y) },
-    };
-    return [vectors, variables];
-  }
-
-  return { variables, channels };
-}
-
-function channels(vectors, variables) {
-  let ScaleX = variables.x.type === "q" ? Linear : null;
-  let ScaleY = variables.y.type === "q" ? Linear : null;
+export function* dot(data, process) {
+  let vectors = process(data);
+  let variables = yield {
+    x: { type: "numeral", domain: extent(vectors.x) },
+    y: { type: "numeral", domain: extent(vectors.y) },
+  };
+  let ScaleX = variables.x.type === "numeral" ? Linear : null;
+  let ScaleY = variables.y.type === "numeral" ? Linear : null;
   let x = ScaleX(variables.x.domain, [0, 2 ** 16]);
   let y = ScaleY(variables.y.domain, [2 ** 16, 0]);
   let subset = vectors.index.filter((index) => vectors.bitset[index >> 5] & (0x80000000 >>> index));

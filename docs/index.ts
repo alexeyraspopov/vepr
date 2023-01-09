@@ -43,7 +43,7 @@ export function sampleLinePlot(container: HTMLElement) {
   }, [] as { index: number; value: number }[]);
 
   let bp = blueprint({
-    y: { type: "q", domain: [0, 150] },
+    y: { type: "numeral", domain: [0, 150] },
     marks: [line(data, identity({ x: "index", y: "value" }))],
   });
 
@@ -66,11 +66,11 @@ export function sampleBarPlot(container: HTMLElement, flow: "x" | "y") {
   let bp =
     flow === "y"
       ? blueprint({
-          y: { type: "q", domain: [0, 13] },
+          y: { type: "numeral", domain: [0, 13] },
           marks: [barY(data, identity({ x: "letter", y: "frequency" }, { sort: order }))],
         })
       : blueprint({
-          x: { type: "q", domain: [0, 13] },
+          x: { type: "numeral", domain: [0, 13] },
           marks: [barX(data, identity({ x: "frequency", y: "letter" }, { sort: order }))],
         });
 

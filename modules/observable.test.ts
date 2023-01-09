@@ -1,5 +1,5 @@
 import { test, expect } from "vitest";
-import { ObservableScope } from "./observable";
+import { ObservableScope } from "./observable.js";
 
 test("observable + computed", () => {
   let os = ObservableScope();
