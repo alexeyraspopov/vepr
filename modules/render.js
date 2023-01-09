@@ -24,7 +24,7 @@ export function render(blueprint, container) {
   let bp = os.observable(blueprint);
   let canvas = createCanvas(container);
   let size = observeElementSize(os, container);
-  let currentColor = observeCurrentColor(os, container);
+  let style = observeContainerStyle(os, container);
   let devicePixelRatio = observeDevicePixelRatio(os);
 
   // Real canvas element size in dom is different from the drawing canvas available
@@ -42,9 +42,9 @@ export function render(blueprint, container) {
   });
 
   os.watch(() => {
-    // HACK canvas only picks up currentColor if defined via style attribute
+    // HACK canvas only picks up currentColor and current font settings if defined via style attribute
     // re-render canvas if the color changes, so dark/light theme switch is supported
-    canvas.style.color = currentColor();
+    Object.assign(canvas.style, style());
 
     let ctx = context();
     let { width, height } = size();
@@ -129,17 +129,28 @@ function observeDevicePixelRatio(os) {
 }
 
 /**
+ * HTMLCanvas element doesn't inherit some style properties from parent. This means the only way
+ * `currentColor` can be used for rendering is when the canvas itself has the color styling set.
+ * This observer tracks parent's current color and readjust when browser's color scheme changes.
+ *
  * @param {ObservableScope} os
  * @param {HTMLElement} target
  */
-function observeCurrentColor(os, target) {
+function observeContainerStyle(os, target) {
   return os.observe(
-    () => getComputedStyle(target).getPropertyValue("color"),
+    () => {
+      let style = getComputedStyle(target);
+      let color = style.getPropertyValue("color");
+      let fontFamily = style.getPropertyValue("font-family");
+      let fontFeatureSettings = style.getPropertyValue("font-feature-settings");
+      return { color, fontFamily, fontFeatureSettings };
+    },
     (cb) => {
       let media = window.matchMedia("(prefers-color-scheme: dark)");
       media.addEventListener("change", cb);
       return () => media.removeEventListener("change", cb);
     },
+    shallowObjectEqual,
   );
 }
 
