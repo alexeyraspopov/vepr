@@ -1,0 +1,42 @@
+import { test, expect } from "vitest";
+import { brush } from "./interaction.js";
+
+test("brush", () => {
+  let ctl = brush(
+    [
+      [0, 0],
+      [200, 100],
+    ],
+    ["x", "y"],
+  );
+
+  expect(ctl.get()).toEqual(null);
+
+  ctl.down(10, 10);
+  ctl.move(40, 40);
+  ctl.move(60, 30);
+  ctl.up();
+
+  expect(ctl.get()).toEqual([
+    [10, 10],
+    [60, 30],
+  ]);
+
+  ctl.down(70, 80);
+  ctl.move(5, 5);
+  ctl.up();
+
+  expect(ctl.get()).toEqual([
+    [5, 5],
+    [70, 80],
+  ]);
+
+  ctl.down(20, 20);
+  ctl.move(25, 25);
+  ctl.up();
+
+  expect(ctl.get()).toEqual([
+    [10, 10],
+    [75, 85],
+  ]);
+});

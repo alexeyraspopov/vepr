@@ -25,3 +25,5 @@ export {
 export { pow, log, symlog } from "./scale/number.js";
 
 export { toggleProfiling } from "./profiling.js";
+
+export { brush } from "./interaction.js";
