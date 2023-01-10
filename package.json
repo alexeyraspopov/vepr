@@ -10,7 +10,7 @@
     "serve": "cd docs && vite",
     "build": "rollup --config rollup.config.js",
     "test": "vitest run --coverage",
-    "docs": "cd docs && vite build --base /vepr",
+    "docs": "cd docs && vite build --config ../vite.config.js",
     "postbuild": "tsc --allowJs --declaration --emitDeclarationOnly build/vepr.js && prettier --write build/vepr.d.ts"
   },
   "devDependencies": {
@@ -22,5 +22,8 @@
     "typescript": "^4.7.4",
     "vite": "^3.0.3",
     "vitest": "^0.25.2"
-  }
+  },
+  "browserslist": [
+    "last 1 Safari version"
+  ]
 }
