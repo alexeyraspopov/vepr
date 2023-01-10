@@ -1,3 +1,5 @@
+const [N, S, W, E] = [0b0001, 0b0010, 0b0100, 0b1000];
+
 /**
  * Brush allows gestures within controlled bounded space in unbounded cartesian coordinates
  *
@@ -33,17 +35,13 @@ export function brush(extent, dimensions) {
 
   function move(x, y) {
     if (state === "select") {
-      let [candidateX0, candidateX1] =
-        x > startX
-          ? [Math.max(x0, startX), Math.min(x, x1)]
-          : [Math.max(x0, x), Math.min(startX, x1)];
-      let [candidateY0, candidateY1] =
-        y > startY
-          ? [Math.max(y0, startY), Math.min(y, y1)]
-          : [Math.max(y0, y), Math.min(startY, y1)];
+      let newX0 = allowsX ? Math.max(x0, Math.min(x, startX)) : x0;
+      let newX1 = allowsX ? Math.min(Math.max(x, startX), x1) : x1;
+      let newY0 = allowsY ? Math.max(y0, Math.min(y, startY)) : y0;
+      let newY1 = allowsY ? Math.min(Math.max(y, startY), y1) : y1;
       selection = [
-        [allowsX ? candidateX0 : x0, allowsY ? candidateY0 : y0],
-        [allowsX ? candidateX1 : x1, allowsY ? candidateY1 : y1],
+        [newX0, newY0],
+        [newX1, newY1],
       ];
     }
     if (state === "drag") {
@@ -61,28 +59,17 @@ export function brush(extent, dimensions) {
       ];
     }
     if (state === "resize") {
-      let candidateX0, candidateX1, candidateY0, candidateY1;
-      if (/[sn]/.test(handle)) {
-        let n = /s/.test(handle) ? 0 : 1;
-        [candidateY0, candidateY1] =
-          y > snapshot[n][1]
-            ? [Math.max(y0, snapshot[n][1]), Math.min(y, y1)]
-            : [Math.max(y0, y), Math.min(snapshot[n][1], y1)];
-      } else {
-        [candidateY0, candidateY1] = [snapshot[0][1], snapshot[1][1]];
-      }
-      if (/[ew]/.test(handle)) {
-        let n = /e/.test(handle) ? 0 : 1;
-        [candidateX0, candidateX1] =
-          x > snapshot[n][0]
-            ? [Math.max(x0, snapshot[n][0]), Math.min(x, x1)]
-            : [Math.max(x0, x), Math.min(snapshot[n][0], x1)];
-      } else {
-        [candidateX0, candidateX1] = [snapshot[0][0], snapshot[1][0]];
-      }
+      let resizeX = handle & (W + E);
+      let startXN = resizeX ? snapshot[handle & E ? 0 : 1][0] : null;
+      let newX0 = allowsX ? (resizeX ? Math.max(x0, Math.min(x, startXN)) : snapshot[0][0]) : x0;
+      let newX1 = allowsX ? (resizeX ? Math.min(Math.max(x, startXN), x1) : snapshot[1][0]) : x1;
+      let resizeY = handle & (N + S);
+      let startYN = resizeY ? snapshot[handle & S ? 0 : 1][1] : null;
+      let newY0 = allowsY ? (resizeY ? Math.max(y0, Math.min(y, startYN)) : snapshot[0][1]) : y0;
+      let newY1 = allowsY ? (resizeY ? Math.min(Math.max(y, startYN), y1) : snapshot[1][1]) : y1;
       selection = [
-        [allowsX ? candidateX0 : x0, allowsY ? candidateY0 : y0],
-        [allowsX ? candidateX1 : x1, allowsY ? candidateY1 : y1],
+        [newX0, newY0],
+        [newX1, newY1],
       ];
     }
   }
@@ -129,13 +116,13 @@ function aligned([xa, ya], [[x0, y0], [x1, y1]], offset, allowsX, allowsY) {
   let alignedE = allowsX && within(xa, x1 - offset / 2, x1 + offset / 2);
   let alignedN = allowsY && within(ya, y0 - offset / 2, y0 + offset / 2);
   let alignedS = allowsY && within(ya, y1 - offset / 2, y1 + offset / 2);
-  if (alignedN && alignedW) return "nw";
-  if (alignedS && alignedE) return "se";
-  if (alignedN && alignedE) return "ne";
-  if (alignedS && alignedW) return "sw";
-  if (alignedN && insideX) return "n";
-  if (alignedS && insideX) return "s";
-  if (alignedW && insideY) return "w";
-  if (alignedE && insideY) return "e";
+  if (alignedN && alignedW) return N + W;
+  if (alignedS && alignedE) return S + E;
+  if (alignedN && alignedE) return N + E;
+  if (alignedS && alignedW) return S + W;
+  if (alignedN && insideX) return N;
+  if (alignedS && insideX) return S;
+  if (alignedW && insideY) return W;
+  if (alignedE && insideY) return E;
   return null;
 }
