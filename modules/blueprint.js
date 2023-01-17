@@ -37,6 +37,11 @@ export function blueprint(options) {
               ...vars[key],
               domain: extent(vars[key].domain.concat(local[key].domain)),
             };
+          } else if (vars[key].type === "ordinal") {
+            vars[key] = {
+              ...vars[key],
+              domain: Array.from(new Set(vars[key].domain.concat(local[key].domain))),
+            };
           }
         }
       }
