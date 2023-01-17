@@ -1,5 +1,5 @@
 import { ObservableScope } from "./observable.js";
-import { Linear, Track } from "./scale/scale.js";
+import { Track } from "./scale/scale.js";
 import { markStart, markFinish } from "./profiling.js";
 import { renderDot } from "./mark/dot.js";
 import { renderBar } from "./mark/bar.js";
@@ -53,10 +53,24 @@ export function render(blueprint, container) {
     let trackY = Track(["1f", "25u"], height, 10, 4);
 
     let { layout } = bp();
+    function interpolate([x0, x1]) {
+      let k = x1 - x0;
+      return (t) => x0 + k * t;
+    }
+
     let areas = {
-      main: { x: Linear([0, 2 ** 16], trackX(1, 1)), y: Linear([0, 2 ** 16], trackY(0, 1)) },
-      haxis: { x: Linear([0, 2 ** 16], trackX(1, 1)), y: Linear([0, 2 ** 16], trackY(1, 1)) },
-      vaxis: { x: Linear([0, 2 ** 16], trackX(0, 1)), y: Linear([0, 2 ** 16], trackY(0, 1)) },
+      main: {
+        x: interpolate(trackX(1, 1)),
+        y: interpolate(trackY(0, 1).reverse()),
+      },
+      haxis: {
+        x: interpolate(trackX(1, 1)),
+        y: interpolate(trackY(1, 1).reverse()),
+      },
+      vaxis: {
+        x: interpolate(trackX(0, 1)),
+        y: interpolate(trackY(0, 1).reverse()),
+      },
     };
 
     let ctl = new AbortController();

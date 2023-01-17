@@ -1,5 +1,5 @@
 import { extent } from "../scale/array.js";
-import { Linear } from "../scale/scale.js";
+import { NormalizeBand, NormalizeRange } from "../scale/number.js";
 
 /**
  * Dots
@@ -12,10 +12,19 @@ export function* dot(data, process) {
     x: { type: "numeral", domain: extent(vectors.x) },
     y: { type: "numeral", domain: extent(vectors.y) },
   };
-  let ScaleX = variables.x.type === "numeral" ? Linear : null;
-  let ScaleY = variables.y.type === "numeral" ? Linear : null;
-  let x = ScaleX(variables.x.domain, [0, 2 ** 16]);
-  let y = ScaleY(variables.y.domain, [2 ** 16, 0]);
+  let x, y;
+  if (variables.x.type === "numeral") {
+    x = NormalizeRange(variables.x.domain);
+  } else if (variables.x.type === "ordinal") {
+    let norm = NormalizeBand(variables.x.domain, 0.1, 0.1);
+    x = (v) => norm(v) + norm.bandwidth / 2;
+  }
+  if (variables.y.type === "numeral") {
+    y = NormalizeRange(variables.y.domain);
+  } else if (variables.y.type === "ordinal") {
+    let norm = NormalizeBand(variables.y.domain, 0.1, 0.1);
+    y = (v) => norm(v) + norm.bandwidth / 2;
+  }
   let subset = vectors.index.filter((index) => vectors.bitset[index >> 5] & (0x80000000 >>> index));
   // QUESTION how can I optimize x/y channels while keeping pointers in tact
   // or should I apply filter on render? can the filter state be altered via controls?

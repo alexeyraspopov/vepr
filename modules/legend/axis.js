@@ -1,23 +1,23 @@
 import { linearTicks } from "../scale/array.js";
-import { Linear, Band } from "../scale/scale.js";
+import { NormalizeBand, NormalizeRange } from "../scale/number.js";
 
 export function axisX(variable) {
   let x, ticks;
   if (variable.type === "numeral") {
     let [start, finish] = variable.domain;
     ticks = linearTicks(start, finish, 15);
-    x = Linear(variable.domain, [0, 2 ** 16]);
+    x = NormalizeRange(variable.domain);
   } else if (variable.type === "ordinal") {
     ticks = variable.domain;
-    let sx = Band(variable.domain, [0, 2 ** 16], 0.1, 0.1);
-    x = (v) => sx(v) + sx.bandwidth() / 2;
+    let norm = NormalizeBand(variable.domain, 0.1, 0.1);
+    x = (v) => norm(v) + norm.bandwidth / 2;
   }
   return {
     key: "axis",
     channels: {
       index: Uint32Array.from(ticks, (_, i) => i),
       x: Float64Array.from(ticks, x),
-      y: 2 ** 16 / 2,
+      y: 1 / 2,
       text: ticks,
       textAlign: "center",
       textBaseline: "middle",
@@ -31,17 +31,17 @@ export function axisY(variable) {
   if (variable.type === "numeral") {
     let [start, finish] = variable.domain;
     ticks = linearTicks(start, finish, 15);
-    y = Linear(variable.domain, [2 ** 16, 0]);
+    y = NormalizeRange(variable.domain);
   } else if (variable.type === "ordinal") {
     ticks = variable.domain;
-    let sy = Band(variable.domain, [2 ** 16, 0], 0.1, 0.1);
-    y = (v) => sy(v) + sy.bandwidth() / 2;
+    let norm = NormalizeBand(variable.domain, 0.1, 0.1);
+    y = (v) => norm(v) + norm.bandwidth / 2;
   }
   return {
     key: "axis",
     channels: {
       index: Uint32Array.from(ticks, (_, i) => i),
-      x: 2 ** 16 / 2,
+      x: 1 / 2,
       y: Float64Array.from(ticks, y),
       text: ticks,
       textAlign: "right",

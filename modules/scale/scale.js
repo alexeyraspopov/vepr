@@ -1,4 +1,5 @@
 import { ascending, bisect, identity, rank } from "./array.js";
+import { NormalizeRange } from "./number.js";
 import { quantileSorted } from "./quantile.js";
 
 /**
@@ -8,12 +9,12 @@ import { quantileSorted } from "./quantile.js";
  * @template [Domain=number | Date] Default is `number | Date`
  * @param {[Domain, Domain]} domain
  * @param {(value: number) => Result} interpolator
+ * @param {(value: Domain) => Domain} [transform]
  * @returns {(value: Domain) => Result}
  */
 export function Sequential(domain, interpolator, transform = identity) {
   let [x0, x1] = Array.from(domain, transform);
-  let k = +x1 - +x0;
-  let normalize = k === 0 ? (x) => 0.5 : (x) => (x - +x0) / k;
+  let normalize = NormalizeRange([x0, x1]);
   return (x) => interpolator(normalize(transform(x)));
 }
 
@@ -32,23 +33,19 @@ export function SequentialQuantile(domain, interpolator, transform = identity) {
 }
 
 /**
- * @template [Domain=number | Date] Default is `number | Date`
+ * @template [Domain=string | boolean | number | Date] Default is `string | boolean | number | Date`
+ * @template Result
  * @param {Domain[]} domain
- * @param {number[]} range
- * @param {(value: Domain) => Domain} [transform=identity] Default is `identity`
- * @returns {(value: Domain) => number}
+ * @param {(value: number) => Result} interpolator
+ * @param {number} [paddingInner=0] Default is `0`
+ * @param {number} [paddingOuter=0] Default is `0`
+ * @param {number} [align=0.5] Default is `0.5`
+ * @returns {((value: Domain) => Result) & { bandwidth: number }}
  */
-export function Linear(domain, range, transform = identity) {
-  if (domain.length > 2 || range.length > 2) {
-    let limit = Math.min(domain.length, range.length) - 1;
-    let lines = Array.from({ length: limit }, (_, i) => {
-      return Linear([domain[i], domain[i + 1]], [range[i], range[i + 1]], transform);
-    });
-    return (x) => lines[bisect(domain, x, 1, limit) - 1](x);
-  }
-  let [x0, x1] = range;
-  let interpolate = (x) => x0 * (1 - x) + x1 * x;
-  return Sequential([domain[0], domain[1]], interpolate, transform);
+export function SequentialBand(domain, interpolator, paddingInner, paddingOuter, align) {
+  let transform = (v) => domain.indexOf(v);
+  let normalize = NormalizeBand_old(domain.length, paddingInner, paddingOuter, align);
+  return Object.assign((x) => interpolator(normalize(transform(x))), normalize);
 }
 
 /**
@@ -71,14 +68,6 @@ export function Ordinal(domain, range) {
  */
 export function Threshold(domain, range) {
   return (x) => range[bisect(domain, x)];
-}
-
-/**
- * @param {[number, number]} range
- * @returns {(value: number) => number}
- */
-export function Clamp(range) {
-  return (x) => Math.max(range[0], Math.min(x, range[1]));
 }
 
 /**
@@ -126,43 +115,6 @@ export function Diverging(domain, interpolator, transform = identity) {
   let sign = x1 < x0 ? -1 : 1;
   let normalize = (x) => 0.5 + (x - x1) * (sign * x < sign * x1 ? k10 : k21);
   return (x) => interpolator(normalize(transform(x)));
-}
-
-/**
- * @template [Domain=string | boolean | number | Date] Default is `string | boolean | number | Date`
- * @param {Domain[]} domain
- * @param {number[]} range
- * @param {number} [paddingInner=0] Default is `0`
- * @param {number} [paddingOuter=0] Default is `0`
- * @param {number} [align=0.5] Default is `0.5`
- * @returns {((value: Domain) => number | undefined) & { bandwidth: () => number }}
- */
-export function Band(domain, range, paddingInner = 0, paddingOuter = 0, align = 0.5) {
-  let reverse = range[1] < range[0];
-  let r0 = reverse ? range[1] : range[0];
-  let r1 = reverse ? range[0] : range[1];
-  let step = (r1 - r0) / Math.max(1, domain.length - paddingInner + paddingOuter * 2);
-  let bandwidth = step * (1 - paddingInner);
-  let start = r0 + (r1 - r0 - step * (domain.length - paddingInner)) * align;
-  return Object.assign(
-    (x) => {
-      let i = domain.indexOf(x);
-      let index = reverse && i >= 0 ? domain.length - 1 - i : i;
-      return index >= 0 ? step * index + start : undefined;
-    },
-    { bandwidth: () => bandwidth },
-  );
-}
-
-/**
- * @template [Domain=string | boolean | number | Date] Default is `string | boolean | number | Date`
- * @param {Domain[]} domain
- * @param {number[]} range
- * @param {number} [padding=0] Default is `0`
- * @param {number} [align=0.5] Default is `0.5`
- */
-export function Point(domain, range, padding = 0, align = 0.5) {
-  return Band(domain, range, 1, padding, align);
 }
 
 const UNIT = /^[\d\.]+u$/;

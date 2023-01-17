@@ -11,16 +11,12 @@ export { transferables } from "./transferables.js";
 
 export { rank, bisect, extent, min, max, ascending, descending } from "./scale/array.js";
 export {
-  Linear,
   Ordinal,
   Threshold,
-  Clamp,
   Quantile,
   Quantize,
   Diverging,
   Sequential,
-  Band,
-  Point,
 } from "./scale/scale.js";
 export { pow, log, symlog } from "./scale/number.js";
 
