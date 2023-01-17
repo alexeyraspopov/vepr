@@ -1,5 +1,5 @@
 import { ascending, bisect, identity, rank } from "./array.js";
-import { NormalizeRange } from "./number.js";
+import { NormalizeRange, NormalizeBand } from "./number.js";
 import { quantileSorted } from "./quantile.js";
 
 /**
@@ -43,9 +43,11 @@ export function SequentialQuantile(domain, interpolator, transform = identity) {
  * @returns {((value: Domain) => Result) & { bandwidth: number }}
  */
 export function SequentialBand(domain, interpolator, paddingInner, paddingOuter, align) {
-  let transform = (v) => domain.indexOf(v);
-  let normalize = NormalizeBand_old(domain.length, paddingInner, paddingOuter, align);
-  return Object.assign((x) => interpolator(normalize(transform(x))), normalize);
+  let normalize = NormalizeBand(domain, paddingInner, paddingOuter, align);
+  return Object.assign(
+    (x) => interpolator(domain.includes(x) ? normalize(x) : undefined),
+    normalize,
+  );
 }
 
 /**

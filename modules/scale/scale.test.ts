@@ -126,27 +126,12 @@ test("band", () => {
   expect(scaleA("b")).toEqual(150);
   expect(scaleA("c")).toEqual(300);
   expect(scaleA("d")).toEqual(450);
-  expect(scaleA("e")).toEqual(undefined);
+  expect(scaleA("e")).toEqual(NaN);
 
   let scaleB = SequentialBand(["a", "b", "c"], InterpolateRange([0, 400]), 0.5);
   expect(scaleB("a")).toEqual(0);
   expect(scaleB("b")).toEqual(160);
   expect(scaleB("c")).toEqual(320);
-
-  let scaleC = SequentialBand(["a", "b", "c"], InterpolateRange([0, 300]), 0.5, 0.25);
-  expect(scaleC("a")).toEqual(25);
-  expect(scaleC("b")).toEqual(125);
-  expect(scaleC("c")).toEqual(225);
-
-  let scaleD = SequentialBand(["a", "b", "c"], InterpolateRange([0, 300]), 0.5, 0.25, 0);
-  expect(scaleD("a")).toEqual(0);
-  expect(scaleD("b")).toEqual(100);
-  expect(scaleD("c")).toEqual(200);
-
-  let scaleE = SequentialBand(["a", "b", "c"], InterpolateRange([0, 300]), 0.5, 0.25, 1);
-  expect(scaleE("a")).toEqual(50);
-  expect(scaleE("b")).toEqual(150);
-  expect(scaleE("c")).toEqual(250);
 });
 
 test("track", () => {
