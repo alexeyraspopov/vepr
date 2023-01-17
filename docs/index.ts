@@ -1,4 +1,4 @@
-import { Linear, descending, render, blueprint, identity, dot, line, barY, barX } from "../modules";
+import { descending, render, blueprint, identity, dot, line, barY, barX } from "../modules";
 
 export function lifecycle(fn: Function) {
   let cleanup: Function | undefined;
@@ -13,8 +13,9 @@ export function lifecycle(fn: Function) {
 export function sampleDotPlot(container: HTMLElement) {
   type SampleRecord = { propA: number; propB: number };
 
-  let randA = Linear([0, 1], [-50, 50]);
-  let randB = Linear([0, 1], [0, 100]);
+  let interpolate = (a: number, b: number) => (x: number) => a * (1 - x) + b * x;
+  let randA = interpolate(-50, 50);
+  let randB = interpolate(0, 100);
   let data = Array.from({ length: 10000 }, () => ({
     propA: randA(Math.random()),
     propB: randB(Math.random()) | 0,
@@ -29,6 +30,23 @@ export function sampleDotPlot(container: HTMLElement) {
 
   let bp = blueprint({
     marks: [dot(data, identity({ x: "propB", y: "propA" }, { filter: predicate }))],
+  });
+
+  return render(bp, container);
+}
+
+export function sampleOrdDotPlot(container: HTMLElement) {
+  let interpolate = (a: number, b: number) => (x: number) => a * (1 - x) + b * x;
+  let randA = interpolate(-10, 10);
+  let randB = "ABCDEFGHIKLMNOPQRSTUVWXYZ".split("");
+  let data = Array.from({ length: 100 }, () => ({
+    propA: randA(Math.random()),
+    propB: randB[(Math.random() * randB.length) | 0],
+  }));
+
+  let bp = blueprint({
+    x: { type: "ordinal", domain: randB },
+    marks: [dot(data, identity({ x: "propB", y: "propA" }))],
   });
 
   return render(bp, container);

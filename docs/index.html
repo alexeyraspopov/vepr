@@ -53,6 +53,15 @@
       });
     </script>
 
+    <div class="canvas-container" id="ordDot"></div>
+    <script type="module">
+      import { lifecycle, sampleOrdDotPlot } from "./index.ts";
+      lifecycle(() => {
+        let ctl = sampleOrdDotPlot(window.ordDot);
+        return () => ctl.remove();
+      });
+    </script>
+
     <div class="canvas-container" id="barY"></div>
     <script type="module">
       import { lifecycle, sampleBarPlot } from "./index.ts";
@@ -71,6 +80,6 @@
       });
     </script>
 
-    <footer><p>ISC License &copy; 2022 Alexey Raspopov</p></footer>
+    <footer><p>ISC License &copy; 2022–2023 Alexey Raspopov</p></footer>
   </body>
 </html>
