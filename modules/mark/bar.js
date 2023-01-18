@@ -1,11 +1,7 @@
 import { extent } from "../scale/array.js";
 import { NormalizeBand, NormalizeRange } from "../scale/number.js";
 
-/**
- * Horizontal bars. Ordinal Y scale, Quantitive X scale
- *
- * @returns {Mark}
- */
+/** Horizontal bars. Ordinal Y scale, Quantitive X scale */
 export function* barX(data, process) {
   let vectors = process(data);
   let variables = yield {
@@ -19,20 +15,16 @@ export function* barX(data, process) {
     key: "bar",
     channels: {
       index: subset,
-      x: Float64Array.from(vectors.index, (index) => x(vectors.x[index])),
-      y: Float64Array.from(vectors.index, (index) => y(vectors.y[index])),
+      x1: 0,
+      x2: Float64Array.from(vectors.index, (index) => x(vectors.x[index])),
+      y1: Float64Array.from(vectors.index, (index) => y(vectors.y[index])),
+      y2: Float64Array.from(vectors.index, (index) => y(vectors.y[index]) + y.bandwidth),
       fill: [],
-      band: y.bandwidth,
-      flow: "x",
     },
   };
 }
 
-/**
- * Vertical series of bars. Quantitive Y scale, Ordinal X scale
- *
- * @returns {Mark}
- */
+/** Vertical series of bars. Quantitive Y scale, Ordinal X scale */
 export function* barY(data, process) {
   let vectors = process(data);
   let variables = yield {
@@ -46,31 +38,37 @@ export function* barY(data, process) {
     key: "bar",
     channels: {
       index: subset,
-      x: Float64Array.from(vectors.index, (index) => x(vectors.x[index])),
-      y: Float64Array.from(vectors.index, (index) => y(vectors.y[index])),
+      x1: Float64Array.from(vectors.index, (index) => x(vectors.x[index])),
+      x2: Float64Array.from(vectors.index, (index) => x(vectors.x[index]) + x.bandwidth),
+      y1: Float64Array.from(vectors.index, (index) => y(vectors.y[index])),
+      y2: 0,
       fill: [], // can be cont or ord
-      band: x.bandwidth,
-      flow: "y",
     },
   };
 }
 
 /** @param {CanvasRenderingContext2D} context */
 export function renderBar(context, scales, channels) {
-  let constant = (v) => (_) => v;
-  let x = ArrayBuffer.isView(channels.x) ? (p) => scales.x(channels.x[p]) : constant(channels.x);
-  let y = ArrayBuffer.isView(channels.y) ? (p) => scales.y(channels.y[p]) : constant(channels.y);
-  if (channels.flow === "y") {
-    let size = scales.x(channels.band) - scales.x(0);
-    for (let pointer of channels.index) {
-      context.fillStyle = "currentColor";
-      context.fillRect(x(pointer), y(pointer), size, scales.y(0) - y(pointer));
-    }
-  } else {
-    let size = scales.y(channels.band) - scales.y(0);
-    for (let pointer of channels.index) {
-      context.fillStyle = "currentColor";
-      context.fillRect(scales.x(0), y(pointer), x(pointer) - scales.x(0), size);
-    }
+  let x1 = fnify(channels.x1, scales.x);
+  let x2 = fnify(channels.x2, scales.x);
+  let y1 = fnify(channels.y1, scales.y);
+  let y2 = fnify(channels.y2, scales.y);
+
+  for (let pointer of channels.index) {
+    context.fillStyle = "currentColor";
+    context.fillRect(
+      x1(pointer),
+      y1(pointer),
+      x2(pointer) - x1(pointer),
+      y2(pointer) - y1(pointer),
+    );
   }
+}
+
+function fnify(channel, scale) {
+  return ArrayBuffer.isView(channel) ? (p) => scale(channel[p]) : constant(scale(channel));
+}
+
+function constant(v) {
+  return (_) => v;
 }
