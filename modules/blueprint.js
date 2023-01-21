@@ -1,5 +1,5 @@
 import { markStart, markFinish } from "./profiling.js";
-import { extent } from "./scale/array.js";
+import { extent, unique } from "./scale/array.js";
 import { axisX, axisY } from "./legend/axis.js";
 
 /**
@@ -32,16 +32,11 @@ export function blueprint(options) {
         if (vars[key] == null) {
           vars[key] = local[key];
         } else {
+          let union = vars[key].domain.concat(local[key].domain);
           if (vars[key].type === "numeral") {
-            vars[key] = {
-              ...vars[key],
-              domain: extent(vars[key].domain.concat(local[key].domain)),
-            };
+            vars[key] = { ...vars[key], domain: extent(union) };
           } else if (vars[key].type === "ordinal") {
-            vars[key] = {
-              ...vars[key],
-              domain: Array.from(new Set(vars[key].domain.concat(local[key].domain))),
-            };
+            vars[key] = { ...vars[key], domain: unique(union) };
           }
         }
       }

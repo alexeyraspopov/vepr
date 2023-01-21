@@ -53,6 +53,31 @@ export function extent(values, valueOf = identity) {
 }
 
 /**
+ * @template T
+ * @template [R=T] Default is `T`
+ * @param {T[]} values
+ * @param {(value: T, index?: number, values?: T[]) => R} [valueOf=identity] Default is `identity`
+ * @returns {R[]} Array of unique values
+ */
+export function unique(values, valueOf) {
+  return Array.from(new Set(valids(values, valueOf)));
+}
+
+function* valids(values, valueOf) {
+  if (valueOf != null) {
+    for (let index = 0, value; index < values.length; index++) {
+      value = valueOf(values[index], index, values);
+      if (value != null && !Number.isNaN(value)) yield value;
+    }
+  } else {
+    for (let index = 0, value; index < values.length; index++) {
+      value = values[index];
+      if (value != null && !Number.isNaN(value)) yield value;
+    }
+  }
+}
+
+/**
  * Basic reusable function that can often be used as a default value for when mapping is
  * unnecessary.
  *
