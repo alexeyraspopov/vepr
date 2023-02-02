@@ -1,13 +1,12 @@
 import { ObservableScope } from "./observable.js";
 import { Track } from "./scale/scale.js";
 import { markStart, markFinish } from "./profiling.js";
-import { renderDot } from "./mark/dot.js";
 import { renderBar } from "./mark/bar.js";
 import { renderLine } from "./mark/line.js";
 import { renderAxis } from "./legend/axis.js";
+import * as shape from "./shape.js";
 
 let renderFn = new Map([
-  ["dot", renderDot],
   ["bar", renderBar],
   ["line", renderLine],
   ["axis", renderAxis],
@@ -83,11 +82,16 @@ export function render(blueprint, container) {
       let scales = areas[area];
       let layers = layout[area];
       for (let layer of layers) {
-        let render = renderFn.get(layer.key);
-
-        ctx.save();
-        render(ctx, scales, layer.channels);
-        ctx.restore();
+        if (layer.key in shape) {
+          ctx.save();
+          shape[layer.key](layer, scales).render(ctx);
+          ctx.restore();
+        } else {
+          let render = renderFn.get(layer.key);
+          ctx.save();
+          render(ctx, scales, layer.channels);
+          ctx.restore();
+        }
       }
     }
 
