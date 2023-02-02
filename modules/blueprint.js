@@ -45,7 +45,7 @@ export function blueprint(options) {
     { x: options.x, y: options.y },
   );
 
-  let channels = options.marks.map((mark) => mark.next(variables).value);
+  let channels = options.marks.flatMap((mark) => mark.next(variables).value);
 
   let layout = { main: channels, haxis: [axisX(variables.x)], vaxis: [axisY(variables.y)] };
 
