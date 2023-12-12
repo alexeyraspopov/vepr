@@ -5,6 +5,7 @@ import { quantileSorted } from "./quantile.js";
 /**
  * Creates a function that maps continuous domain using custom interpolator
  *
+ * @deprecated
  * @template Result
  * @template [Domain=number | Date] Default is `number | Date`
  * @param {[Domain, Domain]} domain
@@ -19,6 +20,7 @@ export function Sequential(domain, interpolator, transform = identity) {
 }
 
 /**
+ * @deprecated
  * @template Result
  * @template [Domain=number | Date] Default is `number | Date`
  * @param {Domain[]} domain
@@ -33,7 +35,9 @@ export function SequentialQuantile(domain, interpolator, transform = identity) {
 }
 
 /**
- * @template [Domain=string | boolean | number | Date] Default is `string | boolean | number | Date`
+ * @deprecated
+ * @template [Domain=string | boolean | number | Date] Default is `string |
+ *   boolean | number | Date`
  * @template Result
  * @param {Domain[]} domain
  * @param {(value: number) => Result} interpolator
@@ -63,7 +67,8 @@ export function Ordinal(domain, range) {
 
 /**
  * @template [D=number | Date] Default is `number | Date`
- * @template [R=string | boolean | number | Date] Default is `string | boolean | number | Date`
+ * @template [R=string | boolean | number | Date] Default is `string | boolean |
+ *   number | Date`
  * @param {D[]} domain
  * @param {R[]} range
  * @returns {(value: D) => R | undefined}
