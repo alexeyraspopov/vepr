@@ -15,4 +15,5 @@ jobs:
           node-version: 20
       - run: npm install
       - run: npx playwright install-deps
+      - run: npx playwright install
       - run: npm run test
