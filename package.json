@@ -1,27 +1,30 @@
 {
   "name": "vepr",
+  "type": "module",
   "version": "0.0.0",
   "description": "A JavaScript library for exploratory data visualization",
-  "author": "Alexey Raspopov",
+  "author": "Oleksii Raspopov",
   "license": "ISC",
   "repository": "alexeyraspopov/vepr",
   "homepage": "https://alexeyraspopov.github.io/vepr",
   "scripts": {
     "serve": "cd docs && vite",
     "build": "rollup --config rollup.config.js",
-    "test": "vitest run --coverage",
+    "test": "vitest run",
     "docs": "cd docs && vite build --config ../vite.config.js",
     "postbuild": "tsc --allowJs --declaration --emitDeclarationOnly build/vepr.js && prettier --write build/vepr.d.ts"
   },
   "devDependencies": {
-    "@vitest/coverage-c8": "^0.24.5",
-    "prettier": "^2.7.1",
-    "prettier-plugin-jsdoc": "^0.4.2",
-    "rollup": "^2.77.0",
-    "rollup-plugin-copy": "^3.4.0",
-    "typescript": "^4.7.4",
-    "vite": "^3.0.3",
-    "vitest": "^0.25.2"
+    "@vitest/browser": "^1.0.1",
+    "@vitest/coverage-istanbul": "^1.0.1",
+    "playwright": "^1.40.1",
+    "prettier": "^3.1.0",
+    "prettier-plugin-jsdoc": "^1.1.1",
+    "rollup": "^4.6.1",
+    "rollup-plugin-copy": "^3.5.0",
+    "typescript": "^5.3.2",
+    "vite": "^5.0.5",
+    "vitest": "^1.0.1"
   },
   "browserslist": [
     "last 1 Safari version"
