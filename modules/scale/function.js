@@ -1,4 +1,4 @@
-import { bisect, ascending, bisector } from "./array.js";
+import { bisect, ascending } from "./array.js";
 
 /**
  * Create a function to interpolate number in range [0..1] to a continuous range
