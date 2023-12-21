@@ -1,6 +1,7 @@
 /**
- * Collect references to transferable objects within nested data structure.
+ * @deprecated I need to make sure a single value can be transported
  *
+ *   Collect references to transferable objects within nested data structure.
  * @param {any} input Any nested data structure to collect transferables from
  * @returns {Transferable[]} A collection of transferable refs
  * @link https://developer.mozilla.org/en-US/docs/Glossary/Transferable_objects

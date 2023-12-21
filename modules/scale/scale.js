@@ -37,7 +37,7 @@ export function SequentialQuantile(domain, interpolator, transform = identity) {
 /**
  * @deprecated
  * @template [Domain=string | boolean | number | Date] Default is `string |
- *   boolean | number | Date`
+ *   boolean | number | Date`. Default is `string | boolean | number | Date`
  * @template Result
  * @param {Domain[]} domain
  * @param {(value: number) => Result} interpolator
@@ -55,6 +55,7 @@ export function SequentialBand(domain, interpolator, paddingInner, paddingOuter,
 }
 
 /**
+ * @deprecated
  * @template D
  * @template R
  * @param {D[]} domain
@@ -66,9 +67,10 @@ export function Ordinal(domain, range) {
 }
 
 /**
+ * @deprecated
  * @template [D=number | Date] Default is `number | Date`
  * @template [R=string | boolean | number | Date] Default is `string | boolean |
- *   number | Date`
+ *   number | Date`. Default is `string | boolean | number | Date`
  * @param {D[]} domain
  * @param {R[]} range
  * @returns {(value: D) => R | undefined}
@@ -78,6 +80,7 @@ export function Threshold(domain, range) {
 }
 
 /**
+ * @deprecated
  * @template R
  * @param {number[]} domain
  * @param {R[]} range
@@ -94,6 +97,7 @@ export function Quantile(domain, range) {
 }
 
 /**
+ * @deprecated
  * @template R
  * @param {[number, number]} domain
  * @param {R[]} range
@@ -109,6 +113,7 @@ export function Quantize(domain, range) {
 }
 
 /**
+ * @deprecated
  * @template Result
  * @param {[number, number, number]} domain
  * @param {(value: number) => Result} interpolator

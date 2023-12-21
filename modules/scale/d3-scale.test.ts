@@ -465,6 +465,18 @@ test.skip("linear.ticks(X) spans linear.nice(X).domain()", () => {
 
 // Diverging
 
+test("legacy: diverging", () => {
+  let nA = normalizeDiverging(0, 0.5, 1);
+  expect(nA(0)).toEqual(0);
+  expect(nA(0.5)).toEqual(0.5);
+  expect(nA(0.75)).toEqual(0.75);
+
+  let nB = normalizeDiverging(-1.2, 0, 2.4);
+  expect(nB(-1.2)).toEqual(0);
+  expect(nB(0.6)).toEqual(0.625);
+  expect(nB(2.4)).toEqual(1);
+});
+
 test("scaleDiverging() has the expected defaults", () => {
   let n = normalizeDiverging(0, 0.5, 1);
   let i = interpolateLinear(0, 1);
@@ -740,6 +752,15 @@ test.skip("quantile.unknown(value) sets the return value for undefined, null, an
 });
 
 // Quantize
+
+test("legacy: quantize", () => {
+  let n = normalizeQuantize(10, 100);
+  let i = interpolateDiscrete([1, 2, 4]);
+  let scaleA = (x: number) => i(n(x));
+  expect(scaleA(20)).toEqual(1);
+  expect(scaleA(50)).toEqual(2);
+  expect(scaleA(80)).toEqual(4);
+});
 
 test("scaleQuantize() has the expected defaults", () => {
   let n = normalizeQuantize(0, 1);
