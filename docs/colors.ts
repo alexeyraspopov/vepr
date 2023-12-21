@@ -1,11 +1,38 @@
-import { scaleQuantile } from "./d3-scale";
-import { schemeBlues, interpolateReds, schemeReds } from "./d3-scale-chromatic";
+import { interpolateReds, schemeReds } from "../modules";
 import {
   interpolateDiscrete,
   normalizeQuantile,
   normalizeLinear,
   normalizeQuantize,
 } from "../modules/scale/function";
+
+export function renderColorRamp(container: HTMLElement, interpolator: (t: number) => string) {
+  let canvas = document.createElement("canvas");
+  canvas.width = 256;
+  canvas.height = 40;
+  canvas.style.cssText = `width: 100%; height: 40px;`;
+
+  let ctx = canvas.getContext("2d")!;
+  for (let i = 0; i <= 255; i++) {
+    ctx.fillStyle = interpolator(i / 255);
+    ctx.fillRect(i, 0, 1, 40);
+  }
+
+  container.append(canvas);
+}
+
+export function renderColorScheme(container: HTMLElement, scheme: (n: number) => string[]) {
+  while (container.firstElementChild) container.firstElementChild.remove();
+  let colors = scheme(9);
+  let fragment = document.createDocumentFragment();
+  for (let color of colors) {
+    let block = document.createElement("div");
+    block.title = color;
+    block.style.cssText = `background-color: ${color}; flex: 1; height: 40px;`;
+    fragment.append(block);
+  }
+  container.append(fragment);
+}
 
 export function drawComparison(container: HTMLElement) {
   let data = [
@@ -55,7 +82,7 @@ export function drawComparison(container: HTMLElement) {
       `),
     );
     let n = normalizeQuantize(...extent);
-    let i = interpolateDiscrete(schemeReds[4].slice(0, -1));
+    let i = interpolateDiscrete(schemeReds(4).slice(0, -1));
     container.append(createPalete(n, i, data));
   }
 
@@ -69,7 +96,7 @@ export function drawComparison(container: HTMLElement) {
       `),
     );
     let n = normalizeQuantile(data);
-    let i = interpolateDiscrete(schemeReds[4].slice(0, -1));
+    let i = interpolateDiscrete(schemeReds(4).slice(0, -1));
     container.append(createPalete(n, i, data));
   }
 
@@ -77,8 +104,9 @@ export function drawComparison(container: HTMLElement) {
     container.append(text(`Sort data with the same quantile normalization.`));
     let vs = data.slice().sort((a, b) => a - b);
     let n = normalizeQuantile(vs);
+    // console.log(scaleQuantile().domain(vs).range(schemeReds(4).slice(0, -1)).quantiles());
     // TODO how do I get distinct quantiles that I can use for legend? (as in showing ranges)
-    let i = interpolateDiscrete(schemeReds[4].slice(0, -1));
+    let i = interpolateDiscrete(schemeReds(4).slice(0, -1));
     container.append(createPalete(n, i, vs));
   }
 }
@@ -89,6 +117,9 @@ function createPalete(n: any, i: any, vs: any[]) {
   for (let j = 0; j < vs.length; j++) {
     let block = document.createElement("div");
     block.style.background = i(n(vs[j]));
+    // block.style.color = "magenta";
+    // block.style.fontSize = "10px";
+    // block.append(document.createTextNode(`${vs[j]}`));
     container.append(block);
   }
 
