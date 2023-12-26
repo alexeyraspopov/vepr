@@ -12,6 +12,27 @@
  * @link https://colorbrewer2.org/
  */
 
+/** @param {number} t */
+export function interpolateViridis(t) {
+  /* This implementation is based on original colors being used for fitting a 
+  curve with the smallest error. Coefficients take a lot less space than full
+  color list and computations are arguably trivial.
+
+  Original colors: https://github.com/BIDS/colormap
+  Current fitting properties: order=5, precision=2 */
+  t = Math.max(0, Math.min(t, 1));
+  return `rgb(${Math.max(
+    0,
+    Math.min(((((-2943.83 * t + 6300.52) * t - 3684.22) * t + 541.33) * t - 34.29) * t + 71.4, 255),
+  )}, ${Math.max(
+    0,
+    Math.min(((((44.7 * t - 422.63) * t + 677.44) * t - 479.08) * t + 408.87) * t + 0.26, 255),
+  )}, ${Math.max(
+    0,
+    Math.min(((((3441.32 * t - 8373.88) * t + 7226.12) * t - 2998.28) * t + 652.29) * t + 78, 255),
+  )})`;
+}
+
 /**
  * Each color scheme has the number of unique colors and uses the same rule for
  * picking colors for 3-9 color subsets. Thus, the same bitsets can be applied.
