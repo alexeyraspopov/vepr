@@ -9,28 +9,84 @@
  * Base 2 and base 16 numbers syntax is used for clarity, the values are
  * converted to base 10 in build time.
  *
+ * Colormap schemes interpolator use polynomial approximation. Coefficients take
+ * a lot less space than full color list and computations are arguably trivial.
+ * Polynomial order and float precision parameters are selected empirically, by
+ * comparing color distance between original colors and approximated.
+ *
  * @link https://colorbrewer2.org/
+ * @link https://github.com/BIDS/colormap
  */
 
-/** @param {number} t */
-export function interpolateViridis(t) {
-  /* This implementation is based on original colors being used for fitting a 
-  curve with the smallest error. Coefficients take a lot less space than full
-  color list and computations are arguably trivial.
+export let interpolateViridis = /*#__PURE__*/ polynomial(
+  // Original colors: https://github.com/BIDS/colormap
+  // Parameters: order=7, precision=2
+  // Red
+  [16957.39, -60736.03, 83337.5, -55355.41, 19460.21, -3771.31, 296.25, 65.44],
+  // Green
+  [1724.54, -4852.29, 4845.96, -2181.18, 630.01, -320.27, 383.44, 1.01],
+  // Blue
+  [9258.26, -25704.51, 28181.52, -16638.84, 6345.73, -1990.01, 500.38, 82.35],
+);
 
-  Original colors: https://github.com/BIDS/colormap
-  Current fitting properties: order=5, precision=2 */
-  t = Math.max(0, Math.min(t, 1));
-  return `rgb(${Math.max(
-    0,
-    Math.min(((((-2943.83 * t + 6300.52) * t - 3684.22) * t + 541.33) * t - 34.29) * t + 71.4, 255),
-  )}, ${Math.max(
-    0,
-    Math.min(((((44.7 * t - 422.63) * t + 677.44) * t - 479.08) * t + 408.87) * t + 0.26, 255),
-  )}, ${Math.max(
-    0,
-    Math.min(((((3441.32 * t - 8373.88) * t + 7226.12) * t - 2998.28) * t + 652.29) * t + 78, 255),
-  )})`;
+export let interpolateInferno = /*#__PURE__*/ polynomial(
+  // Original colors: https://github.com/BIDS/colormap
+  // Parameters: order=7, precision=2
+  // Red
+  [-71.24, 6647.96, -18523.38, 19914.36, -10722.55, 2977.86, 25.87, 0.07],
+  // Green
+  [12230.15, -45922.17, 67532.69, -49585.83, 19332.96, -3666.46, 338.28, -2.86],
+  // Blue
+  [-53493.91, 181334.18, -240309.72, 158640.3, -53705.14, 7488.14, 202.15, 4.88],
+);
+
+export let interpolateMagma = /*#__PURE__*/ polynomial(
+  // Original colors: https://github.com/BIDS/colormap
+  // Parameters: order=7, precision=2
+  // Red
+  [-13521.4, 52084.29, -78428.52, 58703.97, -23507.48, 5068.81, -150.45, 3.1],
+  // Green
+  [23630.62, -85637.14, 121853.49, -86469.78, 32387.71, -6056.13, 551.65, -6.51],
+  // Blue
+  [-20464.29, 70204.47, -98021.14, 71997.07, -28380.16, 4534.44, 311.92, 3.05],
+);
+
+export let interpolatePlasma = /*#__PURE__*/ polynomial(
+  // Original colors: https://github.com/BIDS/colormap
+  // Parameters: order=7, precision=2
+  // Red
+  [6471.17, -23573.18, 33883.87, -24549.69, 9428.06, -2083.92, 648.9, 14.6],
+  // Green
+  [8986.05, -37294.34, 61729.18, -51246.62, 21722.58, -3856.85, 204.85, 3.92],
+  // Blue
+  [-3179.13, 15766.27, -29171.99, 25998.34, -11133.67, 1484.03, 139.06, 137.25],
+);
+
+export let interpolateCividis = /*#__PURE__*/ polynomial(
+  // Parameters: order=7, precision=2
+  // Red
+  [-17070.75, 67998.61, -110138.35, 92449.42, -42132.31, 9815.83, -673.76, 8.46],
+  // Green
+  [227.62, -660.71, 627.11, -124.51, -101.01, 64.65, 168.28, 32.56],
+  // Blue
+  [8224.75, -35536.65, 62558.78, -57224.69, 28412.19, -7315.71, 873.65, 72.15],
+);
+
+/**
+ * Create color interpolator using polynomial coefficients for color channels.
+ *
+ * @param {number[]} r
+ * @param {number[]} g
+ * @param {number[]} b
+ * @returns {(t: number) => string}
+ */
+function polynomial(r, g, b) {
+  /* In order to create an interpolator for RGB colors, this function receives 
+  coefficients for RGB channels and generate an equation for each of them. */
+  /** @param {number[]} c */
+  let eq = (c) =>
+    `Math.max(0,Math.min(${c.reduce((e, c, i) => (i == 0 ? c : `(${e})*t+${c}`))},255))`;
+  return new Function("t", `return \`rgb(\${${eq(r)}},\${${eq(g)}},\${${eq(b)}})\``);
 }
 
 /**
