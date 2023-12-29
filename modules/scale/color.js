@@ -83,10 +83,14 @@ export let interpolateCividis = /*#__PURE__*/ polynomial(
 function polynomial(r, g, b) {
   /* In order to create an interpolator for RGB colors, this function receives 
   coefficients for RGB channels and generate an equation for each of them. */
-  /** @param {number[]} c */
-  let eq = (c) =>
-    `Math.max(0,Math.min(${c.reduce((e, c, i) => (i == 0 ? c : `(${e})*t+${c}`))},255))`;
   return new Function("t", `return \`rgb(\${${eq(r)}},\${${eq(g)}},\${${eq(b)}})\``);
+}
+
+/** @param {number[]} coefficients */
+function eq(coefficients) {
+  return `Math.max(0,Math.min(${coefficients.reduce((eq, coeff, index) => {
+    return index == 0 ? coeff : `(${eq})*t+${coeff}`;
+  })},255))`;
 }
 
 /**
@@ -381,7 +385,7 @@ function scheme(palette, sets, min, max) {
 }
 
 function spline(palette, sets, min, max) {
-  /* Interpolator function is built using 9 piece color scheme. */
+  /* Interpolator function is built using `max` piece color scheme. */
   let bits = sets[max - min];
   let colors = new Uint32Array(max);
   for (let counter = 0, cursor = 0; bits > 0; counter++, bits >>= 1) {
