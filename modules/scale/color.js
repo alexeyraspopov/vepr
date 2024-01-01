@@ -14,8 +14,12 @@
  * Polynomial order and float precision parameters are selected empirically, by
  * comparing color distance between original colors and approximated.
  *
+ * All interpolating functions have their computations streamlined to improve
+ * performance of generating large amount of colors during data viz rendering.
+ *
  * @link https://colorbrewer2.org/
  * @link https://github.com/BIDS/colormap
+ * @link https://kwstat.github.io/pals/
  */
 
 export let interpolateViridis = /*#__PURE__*/ polynomial(
@@ -73,7 +77,7 @@ export let interpolateCividis = /*#__PURE__*/ polynomial(
 );
 
 /**
- * Create color interpolator using polynomial coefficients for color channels.
+ * Create color interpolator using polynomial equations for RGB color channels.
  *
  * @param {number[]} r
  * @param {number[]} g
@@ -92,6 +96,51 @@ function eq(coefficients) {
     return index == 0 ? coeff : `(${eq})*t+${coeff}`;
   })},255))`;
 }
+
+export let interpolateCubicYF = /*#__PURE__*/ polynomial(
+  // Original colors: https://kwstat.github.io/pals/
+  // Parameters: order=7, precision=3
+  // Red
+  [-15890.208, 54233.182, -73123.505, 48310.946, -14896.485, 1532.012, -98.946, 133.229],
+  // Green
+  [7059.036, -25395.384, 36237.157, -26058.931, 9910.958, -2159.478, 633.237, 9.724],
+  // Blue
+  [-24095.262, 79705.687, -105665.816, 71792.702, -24840.466, 2577.129, 436.488, 170.954],
+);
+
+export let interpolateCubicL = /*#__PURE__*/ polynomial(
+  // Original colors: https://kwstat.github.io/pals/
+  // Parameters: order=8, precision=3
+  // Red
+  [-8221.834, 39379.625, -68167.58, 54080.007, -22463.754, 8089.739, -2892.462, 329.36, 117.994],
+  // Green
+  [
+    55242.794, -228988.012, 395122.356, -368687.14, 201277.545, -64530.68, 10974.981, -263.316,
+    2.527,
+  ],
+  // Blue
+  [20312.788, -63703.552, 87157.261, -81632.914, 59694.364, -25426.31, 2942.119, 619.139, 132.898],
+);
+
+export let interpolateParula = /*#__PURE__*/ polynomial(
+  // Original colors: https://kwstat.github.io/pals/
+  // Parameters: order=9, precision=3
+  // Red
+  [
+    925236.406, -4272669.556, 8266083.013, -8669981.892, 5325703.379, -1931522.36, 396943.916,
+    -40968.211, 1388.926, 43.345,
+  ],
+  // Green
+  [
+    -93274.209, 415093.675, -786992.03, 827096.091, -521433.393, 198282.756, -43249.824, 4421.72,
+    261.786, 41.701,
+  ],
+  // Blue
+  [
+    -488959.997, 2249229.641, -4310238.101, 4448116.698, -2664852.122, 927315.193, -173929.655,
+    12682.222, 511.514, 135.402,
+  ],
+);
 
 /**
  * Each color scheme has the number of unique colors and uses the same rule for
