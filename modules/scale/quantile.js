@@ -84,12 +84,8 @@ function quickselect(array, k, left = 0, right = array.length - 1, compare = asc
   return array;
 }
 
-function swap(array2, i, j) {
-  const t = array2[i];
-  array2[i] = array2[j];
-  array2[j] = t;
-}
-
-function identityDatum(v, i, a) {
-  return v;
+function swap(array, i, j) {
+  let temp = array[i];
+  array[i] = array[j];
+  array[j] = temp;
 }

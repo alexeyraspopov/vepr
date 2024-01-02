@@ -9,6 +9,7 @@ export default defineConfig({
         index: resolve(__dirname, "docs/index.html"),
         interaction: resolve(__dirname, "docs/interaction.html"),
         colors: resolve(__dirname, "docs/colors.html"),
+        basic: resolve(__dirname, "docs/basic.html"),
       },
     },
   },

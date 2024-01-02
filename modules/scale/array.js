@@ -29,6 +29,32 @@ export function bisect(values, x, lo = 0, hi = values.length) {
   return lo;
 }
 
+export function bisector(valueOf = identity) {
+  // TODO inline ascending() for speed
+
+  function left(values, x, lo = 0, hi = values.length) {
+    while (lo < hi) {
+      let mid = (lo + hi) >>> 1;
+      let v = valueOf(values[mid]);
+      if (ascending(v, x) < 0) lo = mid + 1;
+      else hi = mid;
+    }
+    return lo;
+  }
+
+  function right(values, x, lo = 0, hi = values.length) {
+    while (lo < hi) {
+      let mid = (lo + hi) >>> 1;
+      let v = valueOf(values[mid]);
+      if (ascending(v, x) <= 0) lo = mid + 1;
+      else hi = mid;
+    }
+    return lo;
+  }
+
+  return { left, right };
+}
+
 /**
  * Returns a tuple of [min, max] values of an array. Returns [undefined, undefined] if the target
  * array is empty.

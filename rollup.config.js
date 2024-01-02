@@ -1,17 +1,24 @@
 import copy from "rollup-plugin-copy";
 
-export default {
-  input: ["modules/index.js"],
-  output: { file: "build/vepr.js", format: "esm" },
-  plugins: [
-    copy({
-      targets: [
-        { src: ["LICENSE", "README.md"], dest: "build" },
-        { src: ["package.json"], dest: "build", transform: generatePkg },
-      ],
-    }),
-  ],
-};
+export default [
+  {
+    input: ["modules/index.js"],
+    output: { file: "build/vepr.js", format: "esm" },
+    plugins: [
+      copy({
+        targets: [
+          { src: ["LICENSE", "README.md"], dest: "build" },
+          { src: ["package.json"], dest: "build", transform: generatePkg },
+        ],
+      }),
+    ],
+  },
+  {
+    input: ["modules/scale/color.js"],
+    output: { file: "build/color.js", format: "esm" },
+    plugins: [],
+  },
+];
 
 function generatePkg(contents) {
   let pkg = JSON.parse(contents.toString());
@@ -26,7 +33,10 @@ function generatePkg(contents) {
     type: "module",
     main: "./vepr.js",
     module: "./vepr.js",
-    exports: "./vepr.js",
+    exports: {
+      ".": "./vepr.js",
+      "./color": "./color.js",
+    },
     types: "./vepr.d.ts",
     files: ["*.js", "*.d.ts"],
     sideEffects: false,

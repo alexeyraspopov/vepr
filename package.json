@@ -5,7 +5,10 @@
   "description": "A JavaScript library for exploratory data visualization",
   "author": "Oleksii Raspopov",
   "license": "ISC",
-  "repository": "alexeyraspopov/vepr",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/alexeyraspopov/vepr.git"
+  },
   "homepage": "https://alexeyraspopov.github.io/vepr",
   "scripts": {
     "serve": "cd docs && vite",
