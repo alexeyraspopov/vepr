@@ -1,24 +1,22 @@
+import { defineConfig } from "rollup";
 import copy from "rollup-plugin-copy";
 
-export default [
-  {
-    input: ["modules/index.js"],
-    output: { file: "build/vepr.js", format: "esm" },
-    plugins: [
-      copy({
-        targets: [
-          { src: ["LICENSE", "README.md"], dest: "build" },
-          { src: ["package.json"], dest: "build", transform: generatePkg },
-        ],
-      }),
-    ],
+export default defineConfig({
+  input: ["modules/index.js", "modules/scale/color.js"],
+  output: {
+    dir: "build",
+    format: "esm",
+    entryFileNames: (chunk) => `${chunk.name === "index" ? "vepr" : chunk.name}.js`,
   },
-  {
-    input: ["modules/scale/color.js"],
-    output: { file: "build/color.js", format: "esm" },
-    plugins: [],
-  },
-];
+  plugins: [
+    copy({
+      targets: [
+        { src: ["LICENSE", "README.md"], dest: "build" },
+        { src: ["package.json"], dest: "build", transform: generatePkg },
+      ],
+    }),
+  ],
+});
 
 function generatePkg(contents) {
   let pkg = JSON.parse(contents.toString());
