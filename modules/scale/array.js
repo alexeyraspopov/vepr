@@ -4,7 +4,8 @@
  * @template T
  * @template [R=T] Default is `T`
  * @param {T[]} values
- * @param {(value: T, index?: number, values?: T[]) => R} [valueOf=identity] Default is `identity`
+ * @param {(value: T, index?: number, values?: T[]) => R} [valueOf=identity]
+ *   Default is `identity`
  * @returns {Uint32Array}
  */
 export function rank(values, valueOf = identity) {
@@ -23,7 +24,8 @@ export function rank(values, valueOf = identity) {
 export function bisect(values, x, lo = 0, hi = values.length) {
   while (lo < hi) {
     let mid = (lo + hi) >>> 1;
-    if (ascending(values[mid], x) <= 0) lo = mid + 1;
+    let v = values[mid];
+    if (ascending(v, x) <= 0) lo = mid + 1;
     else hi = mid;
   }
   return lo;
@@ -56,33 +58,46 @@ export function bisector(valueOf = identity) {
 }
 
 /**
- * Returns a tuple of [min, max] values of an array. Returns [undefined, undefined] if the target
- * array is empty.
+ * Returns a tuple of [min, max] values of an array. Returns [undefined,
+ * undefined] if the target array is empty.
  *
  * @template T
  * @template [R=T] Default is `T`
  * @param {T[]} values
- * @param {(value: T, index?: number, values?: T[]) => R} [valueOf=identity] Default is `identity`
+ * @param {(value: T, index?: number, values?: T[]) => R} [valueOf]
  * @returns {[R, R] | [undefined, undefined]} Tuple of min and max values
  */
-export function extent(values, valueOf = identity) {
+export function extent(values, valueOf) {
   if (values.length === 0) return [undefined, undefined];
-  let min = valueOf(values[0], 0, values);
-  let max = min;
-  for (let index = 1, value; index < values.length; index++) {
-    value = valueOf(values[index], index, values);
-    if (value == null) continue;
-    if (value > max) max = value;
-    else if (value < min) min = value;
+  if (valueOf != null) {
+    let min = valueOf(values[0], 0, values);
+    let max = min;
+    for (let index = 1, value; index < values.length; index++) {
+      value = valueOf(values[index], index, values);
+      if (value == null) continue;
+      if (value > max) max = value;
+      else if (value < min) min = value;
+    }
+    return [min, max];
+  } else {
+    let min = values[0];
+    let max = min;
+    for (let index = 1, value; index < values.length; index++) {
+      value = values[index];
+      if (value == null) continue;
+      if (value > max) max = value;
+      else if (value < min) min = value;
+    }
+    return [min, max];
   }
-  return [min, max];
 }
 
 /**
  * @template T
  * @template [R=T] Default is `T`
  * @param {T[]} values
- * @param {(value: T, index?: number, values?: T[]) => R} [valueOf=identity] Default is `identity`
+ * @param {(value: T, index?: number, values?: T[]) => R} [valueOf=identity]
+ *   Default is `identity`
  * @returns {R[]} Array of unique values
  */
 export function unique(values, valueOf) {
@@ -104,8 +119,8 @@ function* valids(values, valueOf) {
 }
 
 /**
- * Basic reusable function that can often be used as a default value for when mapping is
- * unnecessary.
+ * Basic reusable function that can often be used as a default value for when
+ * mapping is unnecessary.
  *
  * @template T
  * @param {T} value
@@ -116,41 +131,62 @@ export function identity(value) {
 }
 
 /**
- * Returns max value of an array. Returns undefined if the target array is empty.
+ * Returns max value of an array. Returns undefined if the target array is
+ * empty.
  *
  * @template T
  * @template [R=T] Default is `T`
  * @param {T[]} values
- * @param {(value: T, index?: number, values?: T[]) => R} [valueOf=identity] Default is `identity`
+ * @param {(value: T, index?: number, values?: T[]) => R} [valueOf]
  * @returns {R | undefined}
  */
-export function max(values, valueOf = identity) {
+export function max(values, valueOf) {
+  // TODO switch to iterables
   if (values.length === 0) return undefined;
-  let max = valueOf(values[0], 0, values);
-  for (let index = 1, value; index < values.length; index++) {
-    value = valueOf(values[index], index, values);
-    if (value != null && max < value) max = value;
+  if (valueOf != null) {
+    let max = valueOf(values[0], 0, values);
+    for (let index = 1, value; index < values.length; index++) {
+      value = valueOf(values[index], index, values);
+      if (value != null && max < value) max = value;
+    }
+    return max;
+  } else {
+    let max = values[0];
+    for (let index = 1, value; index < values.length; index++) {
+      value = values[index];
+      if (value != null && max < value) max = value;
+    }
+    return max;
   }
-  return max;
 }
 
 /**
- * Returns min value of an array. Returns undefined if the target array is empty.
+ * Returns min value of an array. Returns undefined if the target array is
+ * empty.
  *
  * @template T
  * @template [R=T] Default is `T`
  * @param {T[]} values
- * @param {(value: T, index?: number, values?: T[]) => R} [valueOf=identity] Default is `identity`
+ * @param {(value: T, index?: number, values?: T[]) => R} [valueOf]
  * @returns {R | undefined}
  */
-export function min(values, valueOf = identity) {
+export function min(values, valueOf) {
   if (values.length === 0) return undefined;
-  let min = valueOf(values[0], 0, values);
-  for (let index = 1, value; index < values.length; index++) {
-    value = valueOf(values[index], index, values);
-    if (value != null && min > value) min = value;
+  if (valueOf != null) {
+    let min = valueOf(values[0], 0, values);
+    for (let index = 1, value; index < values.length; index++) {
+      value = valueOf(values[index], index, values);
+      if (value != null && min > value) min = value;
+    }
+    return min;
+  } else {
+    let min = values[0];
+    for (let index = 1, value; index < values.length; index++) {
+      value = values[index];
+      if (value != null && min > value) min = value;
+    }
+    return min;
   }
-  return min;
 }
 
 let e10 = Math.sqrt(50);
@@ -179,8 +215,10 @@ export function linearTicks(start, stop, count) {
 }
 
 /**
- * A comparator that ensures ascending order and handles nulls and NaNs. Resulting order is
- * following: [x0, x1, x2, x3, x..., NaN..., null..., undefined...]
+ * A comparator that ensures ascending order and handles nulls and NaNs.
+ * Resulting order is following:
+ *
+ * [x0, x1, x2, x3, x..., NaN..., null..., undefined...]
  *
  * @template T
  * @param {T} a
@@ -188,12 +226,23 @@ export function linearTicks(start, stop, count) {
  */
 export function ascending(a, b) {
   // prettier-ignore
-  return Object.is(a, b) ? 0 : a === null ? 1 : b === null ? -1 : a < b ? -1 : a > b ? 1 : isNaN(a) ? 1 : isNaN(b) ? -1 : 0;
+  return (
+    Object.is(a, b) ? 0
+  : a === null ? 1
+  : b === null ? -1
+  : a < b ? -1
+  : a > b ? 1
+  : isNaN(a) ? 1
+  : isNaN(b) ? -1
+  : 0
+  );
 }
 
 /**
- * A comparator that ensures descending order and handles nulls and NaNs. Resulting order is
- * following: [x4, x3, x2, x1, x..., NaN..., null..., undefined...]
+ * A comparator that ensures descending order and handles nulls and NaNs.
+ * Resulting order is following:
+ *
+ * [x4, x3, x2, x1, x..., NaN..., null..., undefined...]
  *
  * @template T
  * @param {T} a
@@ -201,5 +250,14 @@ export function ascending(a, b) {
  */
 export function descending(a, b) {
   // prettier-ignore
-  return Object.is(a, b) ? 0 : a === null ? 1 : b === null ? -1 : a < b ? 1 : a > b ? -1 : isNaN(a) ? 1 : isNaN(b) ? -1 : 0;
+  return (
+    Object.is(a, b) ? 0
+  : a === null ? 1
+  : b === null ? -1
+  : a < b ? 1
+  : a > b ? -1
+  : isNaN(a) ? 1
+  : isNaN(b) ? -1
+  : 0
+  );
 }

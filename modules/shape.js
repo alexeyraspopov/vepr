@@ -1,3 +1,5 @@
+import { identity } from "./scale/array";
+
 /**
  * @template T
  * @param {T[] | object} data
@@ -9,9 +11,8 @@
  */
 export function dot(data, transform) {
   function snapshot() {
-    if (!(ArrayBuffer.isView(data) || Array.isArray(data))) return data;
-    let { x, y, r } = Object.assign({}, transform);
-    let apply = (f, d, t) => (f != null ? (f.length > 0 ? t.from(d, f) : f()) : null);
+    if (!isArrayLike(data)) return data;
+    let { x, y, r } = transform;
     return {
       key: "dot",
       index: Uint32Array.from(data, (_, i) => i),
@@ -22,13 +23,13 @@ export function dot(data, transform) {
   }
 
   function channels(input) {
-    let { x, y, r } = Object.assign({ r: constant(3) }, transform);
-    if (Array.isArray(input)) return { series: input, x, y, r };
+    let { x, y, r } = transform;
+    if (isArrayLike(input)) return { series: input, x, y, r };
     return {
       series: input.index,
       x: vector(x, input.x),
       y: vector(y, input.y),
-      r: vector(r, input.r),
+      r: input.r != null ? vector(identity, input.r) : constant(3),
     };
   }
 
@@ -49,16 +50,117 @@ export function dot(data, transform) {
   return { render, snapshot };
 }
 
+export function line(data, transform) {
+  function snapshot() {
+    if (!isArrayLike(data)) return data;
+    let { x, y } = transform;
+    return {
+      key: "line",
+      index: Uint32Array.from(data, (_, i) => i),
+      x: apply(x, data, Float64Array),
+      y: apply(y, data, Float64Array),
+    };
+  }
+
+  function channels(input) {
+    let { x, y } = transform;
+    if (isArrayLike(input)) return { series: input, x, y };
+    return {
+      series: input.index,
+      x: vector(x, input.x),
+      y: vector(y, input.y),
+    };
+  }
+
+  /** @param {CanvasRenderingContext2D} context */
+  function render(context) {
+    let { series, x, y } = channels(data);
+
+    let path = new Path2D();
+
+    let lx, ly;
+    let moving = true;
+    for (let item of series) {
+      lx = x(item);
+      ly = y(item);
+      if (Number.isNaN(lx) || Number.isNaN(ly)) {
+        moving = true;
+      } else {
+        if (moving) path.moveTo(lx, ly);
+        else path.lineTo(lx, ly);
+        moving = false;
+      }
+    }
+
+    context.beginPath();
+    context.lineWidth = 1.5;
+    context.lineCap = "round";
+    context.lineJoin = "round";
+    context.miterLimit = 1;
+    context.strokeStyle = "currentColor";
+    context.stroke(path);
+  }
+
+  return { render, snapshot };
+}
+
+export function rect(data, transform) {
+  function snapshot() {
+    if (!isArrayLike(data)) return data;
+    let { x, y, x1 = x, x2 = x, y1 = y, y2 = y, alpha } = transform;
+    return {
+      key: "rect",
+      index: Uint32Array.from(data, (_, i) => i),
+      x1: apply(x1, data, Float64Array),
+      x2: apply(x2, data, Float64Array),
+      y1: apply(y1, data, Float64Array),
+      y2: apply(y2, data, Float64Array),
+      alpha: apply(alpha, data, Float64Array),
+    };
+  }
+
+  function channels(input) {
+    let { x, y, x1 = x, x2 = x, y1 = y, y2 = y, alpha } = transform;
+    if (isArrayLike(input)) return { series: input, x1, x2, y1, y2, alpha };
+    return {
+      series: input.index,
+      x1: vector(x1, input.x1),
+      x2: vector(x2, input.x2),
+      y1: vector(y1, input.y1),
+      y2: vector(y2, input.y2),
+      alpha: input.alpha != null ? vector(identity, input.alpha) : constant(1),
+    };
+  }
+
+  /** @param {CanvasRenderingContext2D} context */
+  function render(context) {
+    let { series, x1, x2, y1, y2, alpha } = channels(data);
+
+    context.fillStyle = "currentColor";
+    for (let item of series) {
+      context.globalAlpha = alpha(item);
+      context.fillRect(x1(item), y1(item), x2(item) - x1(item), y2(item) - y1(item));
+    }
+  }
+
+  return { render, snapshot };
+}
+
 function constant(value) {
   return (_) => value;
 }
 
+function apply(fn, data, type) {
+  return fn != null ? (fn.length > 0 ? type.from(data, fn) : fn()) : null;
+}
+
 function vector(fn, data) {
-  return ArrayBuffer.isView(data) || Array.isArray(data)
+  return isArrayLike(data)
     ? (pointer) => fn(data[pointer], pointer)
     : constant(fn != null ? fn(data) : data);
 }
 
-function identity(value) {
-  return identity;
+/** @param {any} input */
+function isArrayLike(input) {
+  return ArrayBuffer.isView(input) || Array.isArray(input);
 }

@@ -18,8 +18,8 @@
     "postbuild": "for i in vepr color; do tsc --allowJs --declaration --emitDeclarationOnly build/$i.js && prettier --write build/$i.d.ts; done"
   },
   "devDependencies": {
-    "@vitest/browser": "^1.0.1",
-    "@vitest/coverage-istanbul": "^1.0.1",
+    "@vitest/browser": "^1.2.2",
+    "@vitest/coverage-istanbul": "^1.2.2",
     "playwright": "^1.40.1",
     "prettier": "^3.1.0",
     "prettier-plugin-jsdoc": "^1.1.1",
@@ -27,7 +27,7 @@
     "rollup-plugin-copy": "^3.5.0",
     "typescript": "^5.3.2",
     "vite": "^5.0.5",
-    "vitest": "^1.0.1"
+    "vitest": "^1.2.2"
   },
   "browserslist": [
     "last 1 Safari version"

@@ -10,15 +10,9 @@ import { axisX, axisY } from "./legend/axis.js";
  */
 
 /**
- * @typedef {object} Mark
- * @property {Function} variables
- * @property {Function} channels
- */
-
-/**
- * Materialize the data visualization so it can be sent to a renderer. The blueprint composer
- * function generates an optimized definition of data visualization that then needs to be send to
- * renderer.
+ * Materialize the data visualization so it can be sent to a renderer. The
+ * blueprint composer function generates an optimized definition of data
+ * visualization that then needs to be send to renderer.
  *
  * @returns {Blueprint}
  */
@@ -45,9 +39,10 @@ export function blueprint(options) {
     { x: options.x, y: options.y },
   );
 
-  let channels = options.marks.flatMap((mark) => mark.next(variables).value);
+  let layers = options.marks.flatMap((mark) => mark.next(variables).value);
 
-  let layout = { main: channels, haxis: [axisX(variables.x)], vaxis: [axisY(variables.y)] };
+  // I can produce an array of layouts to represent faceting
+  let layout = { main: layers, haxis: [axisX(variables.x)], vaxis: [axisY(variables.y)] };
 
   markFinish("blueprint");
 

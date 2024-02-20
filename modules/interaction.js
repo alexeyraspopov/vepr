@@ -1,10 +1,11 @@
 const [N, S, W, E] = [0b0001, 0b0010, 0b0100, 0b1000];
 
 /**
- * Brush allows gestures within controlled bounded space in unbounded cartesian coordinates
+ * Brush allows gestures within controlled bounded space in unbounded cartesian
+ * coordinates
  *
- * @param {[[number, number], [number, number]]} extent Top left and right bottom points of
- *   available space
+ * @param {[[number, number], [number, number]]} extent Top left and right
+ *   bottom points of available space
  * @param {("x" | "y")[]} dimensions Gesture constraints
  */
 export function brush(extent, dimensions) {
@@ -25,11 +26,11 @@ export function brush(extent, dimensions) {
       selection == null
         ? "select"
         : within(x, selection[0][0] + offset / 2, selection[1][0] - offset / 2) &&
-          within(y, selection[0][1] + offset / 2, selection[1][1] - offset / 2)
-        ? "drag"
-        : (handle = aligned([x, y], selection, offset, allowsX, allowsY))
-        ? "resize"
-        : "select";
+            within(y, selection[0][1] + offset / 2, selection[1][1] - offset / 2)
+          ? "drag"
+          : (handle = aligned([x, y], selection, offset, allowsX, allowsY))
+            ? "resize"
+            : "select";
     snapshot = selection;
   }
 
@@ -53,20 +54,24 @@ export function brush(extent, dimensions) {
       let candidateY0 = snapshot[0][1] + dy;
       let candidateY1 = snapshot[1][1] + dy;
       let adjustY = candidateY0 < y0 ? y0 - candidateY0 : candidateY1 > y1 ? y1 - candidateY1 : 0;
+      let newX0 = allowsX ? candidateX0 + adjustX : x0;
+      let newX1 = allowsX ? candidateX1 + adjustX : x1;
+      let newY0 = allowsY ? candidateY0 + adjustY : y0;
+      let newY1 = allowsY ? candidateY1 + adjustY : y1;
       selection = [
-        [allowsX ? candidateX0 + adjustX : x0, allowsY ? candidateY0 + adjustY : y0],
-        [allowsX ? candidateX1 + adjustX : x1, allowsY ? candidateY1 + adjustY : y1],
+        [newX0, newY0],
+        [newX1, newY1],
       ];
     }
     if (state === "resize") {
-      let resizeX = handle & (W + E);
-      let startXN = resizeX ? snapshot[handle & E ? 0 : 1][0] : null;
-      let newX0 = allowsX ? (resizeX ? Math.max(x0, Math.min(x, startXN)) : snapshot[0][0]) : x0;
-      let newX1 = allowsX ? (resizeX ? Math.min(Math.max(x, startXN), x1) : snapshot[1][0]) : x1;
-      let resizeY = handle & (N + S);
-      let startYN = resizeY ? snapshot[handle & S ? 0 : 1][1] : null;
-      let newY0 = allowsY ? (resizeY ? Math.max(y0, Math.min(y, startYN)) : snapshot[0][1]) : y0;
-      let newY1 = allowsY ? (resizeY ? Math.min(Math.max(y, startYN), y1) : snapshot[1][1]) : y1;
+      let resizeX = allowsX && handle & (W + E);
+      let resizeY = allowsY && handle & (N + S);
+      let startX = resizeX ? snapshot[handle & E ? 0 : 1][0] : null;
+      let startY = resizeY ? snapshot[handle & S ? 0 : 1][1] : null;
+      let newX0 = resizeX ? Math.max(x0, Math.min(x, startX)) : snapshot[0][0];
+      let newX1 = resizeX ? Math.min(Math.max(x, startX), x1) : snapshot[1][0];
+      let newY0 = resizeY ? Math.max(y0, Math.min(y, startY)) : snapshot[0][1];
+      let newY1 = resizeY ? Math.min(Math.max(y, startY), y1) : snapshot[1][1];
       selection = [
         [newX0, newY0],
         [newX1, newY1],
