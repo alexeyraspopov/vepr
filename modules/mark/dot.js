@@ -14,11 +14,10 @@ export function* dot(data, process) {
   let subset = vectors.index.filter((index) => vectors.bitset[index >> 5] & (0x80000000 >>> index));
   // QUESTION how can I optimize x/y channels while keeping pointers in tact
   // or should I apply filter on render? can the filter state be altered via controls?
-  return shape
-    .dot(subset, {
-      x: (p) => x(vectors.x[p]),
-      y: (p) => y(vectors.y[p]),
-      r: () => 3,
-    })
-    .snapshot();
+  let { dot } = shape;
+  return dot(subset, {
+    x: (p) => x(vectors.x[p]),
+    y: (p) => y(vectors.y[p]),
+    r: () => 3,
+  }).snapshot();
 }
