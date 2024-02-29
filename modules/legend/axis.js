@@ -1,16 +1,13 @@
 import { linearTicks } from "../scale/array.js";
-import { NormalizeBand, NormalizeRange } from "../scale/number.js";
+import { apply, normalizeOf } from "../variable.js";
 
 export function axisX(variable) {
-  let x, ticks;
+  let x = normalizeOf(variable);
+  let ticks;
   if (variable.type === "numeral") {
-    let [start, finish] = variable.domain;
-    ticks = linearTicks(start, finish, 15);
-    x = NormalizeRange(variable.domain);
+    ticks = linearTicks(variable.domain[0], variable.domain[1], 15);
   } else if (variable.type === "ordinal") {
     ticks = variable.domain;
-    let norm = NormalizeBand(variable.domain, 0.1, 0.1);
-    x = (v) => norm(v) + norm.bandwidth / 2;
   }
   return {
     key: "axis",
@@ -21,21 +18,18 @@ export function axisX(variable) {
       text: ticks,
       textAlign: "center",
       textBaseline: "middle",
-      filterStrategy: "parity",
+      filterStrategy: variable.type === "numeral" ? "parity" : null,
     },
   };
 }
 
 export function axisY(variable) {
-  let y, ticks;
+  let y = normalizeOf(variable);
+  let ticks;
   if (variable.type === "numeral") {
-    let [start, finish] = variable.domain;
-    ticks = linearTicks(start, finish, 15);
-    y = NormalizeRange(variable.domain);
+    ticks = linearTicks(variable.domain[0], variable.domain[1], 15);
   } else if (variable.type === "ordinal") {
     ticks = variable.domain;
-    let norm = NormalizeBand(variable.domain, 0.1, 0.1);
-    y = (v) => norm(v) + norm.bandwidth / 2;
   }
   return {
     key: "axis",
@@ -46,19 +40,14 @@ export function axisY(variable) {
       text: ticks,
       textAlign: "right",
       textBaseline: "middle",
-      filterStrategy: "parity",
+      filterStrategy: variable.type === "numeral" ? "parity" : null,
     },
   };
 }
 
 export function renderAxis(context, scales, channels) {
-  let constant = (v) => (_) => v;
-  let x = ArrayBuffer.isView(channels.x)
-    ? (p) => scales.x(channels.x[p])
-    : constant(scales.x(channels.x));
-  let y = ArrayBuffer.isView(channels.y)
-    ? (p) => scales.y(channels.y[p])
-    : constant(scales.y(channels.y));
+  let x = apply(scales.x, channels.x);
+  let y = apply(scales.y, channels.y);
 
   context.font = "normal 10px/1 sans-serif";
   context.fillStyle = "currentColor";
@@ -76,14 +65,19 @@ export function renderAxis(context, scales, channels) {
   });
 
   let M = context.measureText("M");
-  let filter = channels.filterStrategy === "greedy" ? greedy : parity;
+  let filter =
+    channels.filterStrategy != null
+      ? channels.filterStrategy === "greedy"
+        ? greedy
+        : parity
+      : null;
 
-  if (ArrayBuffer.isView(channels.x)) {
+  if (filter != null && ArrayBuffer.isView(channels.x)) {
     let gap = M.width;
     labels = filter(labels, gap);
   }
 
-  if (ArrayBuffer.isView(channels.y)) {
+  if (filter != null && ArrayBuffer.isView(channels.y)) {
     let gap = M.actualBoundingBoxAscent + M.actualBoundingBoxDescent;
     labels = filter(labels, gap);
   }
