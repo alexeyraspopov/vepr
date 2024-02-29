@@ -1,0 +1,67 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="icon" href="/vepr/assets/favicon-CH1ytnAU.ico" />
+    <style>
+      .brush-container {
+        touch-action: none;
+        position: relative;
+      }
+      .brush-container::before {
+        content: "Brush, drag, resize…";
+        display: block;
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        font-style: italic;
+        opacity: 0.3;
+      }
+    </style>
+    <script type="module" crossorigin src="/vepr/assets/interaction-BrppYV0U.js"></script>
+    <link rel="modulepreload" crossorigin href="/vepr/assets/profiling-WcgH7yTa.js">
+    <link rel="stylesheet" crossorigin href="/vepr/assets/profiling-C4O5Buzl.css">
+  </head>
+  <body>
+    <h1>🐗</h1>
+
+    <p>
+      This is an example page to test Brush interactivity controls. Source code for brush model can
+      be found in
+      <a
+        href="https://github.com/alexeyraspopov/vepr/blob/main/modules/interaction.js"
+        target="_blank"
+        >modules/interaction.js</a
+      >
+      and this example code is in
+      <a href="https://github.com/alexeyraspopov/vepr/blob/main/docs/interaction.ts" target="_blank"
+        >docs/interaction.ts</a
+      >.
+    </p>
+
+    <p>Start drawing 2-dimensional brush in the section below.</p>
+
+    <div class="canvas-container brush-container">
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        style="width: 100%; height: 100%; display: block"
+        id="brushingContainer"
+      ></svg>
+    </div>
+
+    <p>Brush can also be locked to a single dimension. Try it out in the section below.</p>
+
+    <div class="canvas-container brush-container" style="height: 50px; aspect-ratio: auto">
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        style="width: 100%; height: 100%; display: block"
+        id="brushingContainerX"
+      ></svg>
+    </div>
+
+
+    <footer><p>ISC License &copy; 2022–2024 Oleksii Raspopov</p></footer>
+  </body>
+</html>
