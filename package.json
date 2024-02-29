@@ -14,12 +14,15 @@
     "serve": "cd docs && vite",
     "build": "rollup --config rollup.config.js",
     "test": "vitest run",
+    "lint": "eslint modules --max-warnings 10",
     "docs": "cd docs && vite build --config ../vite.config.js",
     "postbuild": "for i in vepr color; do tsc --allowJs --declaration --emitDeclarationOnly build/$i.js && prettier --write build/$i.d.ts; done"
   },
   "devDependencies": {
     "@vitest/browser": "^1.2.2",
     "@vitest/coverage-istanbul": "^1.2.2",
+    "eslint": "^9.0.0-beta.1",
+    "globals": "^14.0.0",
     "playwright": "^1.40.1",
     "prettier": "^3.1.0",
     "prettier-plugin-jsdoc": "^1.1.1",

@@ -7,7 +7,8 @@ export default defineConfig({
       provider: "istanbul",
     },
     browser: {
-      enabled: true,
+      // https://github.com/vitest-dev/vitest/issues/4173
+      enabled: !process.env.CI,
       provider: "playwright",
       name: "webkit",
       headless: true,

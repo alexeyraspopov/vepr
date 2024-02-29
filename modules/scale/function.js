@@ -10,7 +10,7 @@ import { bisect, ascending } from "./array.js";
  */
 export function interpolateLinear(r1, r2) {
   let k = r2 - r1;
-  return k === 0 ? (_) => r1 : (t) => r1 + k * t;
+  return k === 0 ? () => r1 : (t) => r1 + k * t;
 }
 
 /**
@@ -34,7 +34,7 @@ export function interpolateDiscrete(vs) {
  */
 export function normalizeLinear(d1, d2) {
   let k = d2 - d1;
-  return k === 0 ? (_) => 0.5 : (x) => (x - d1) / k;
+  return k === 0 ? () => 0.5 : (x) => (x - d1) / k;
 }
 
 /**

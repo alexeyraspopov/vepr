@@ -1,16 +1,10 @@
 import { ObservableScope } from "./observable.js";
 import { Track } from "./scale/scale.js";
 import { markStart, markFinish } from "./profiling.js";
-import { renderBar } from "./mark/bar.js";
-import { renderLine } from "./mark/line.js";
 import { renderAxis } from "./legend/axis.js";
 import * as shape from "./shape.js";
 
-let renderFn = new Map([
-  ["bar", renderBar],
-  ["line", renderLine],
-  ["axis", renderAxis],
-]);
+let renderFn = new Map([["axis", renderAxis]]);
 
 /**
  * Render a visualization blueprint using Canvas
@@ -134,7 +128,12 @@ function observeElementSize(os, target) {
   );
 }
 
-/** @param {ObservableScope} os */
+/**
+ * Browser's devicePixelRatio can change dynamically when user switches monitor
+ * resolution or moves a browser window from one monitor to another.
+ *
+ * @param {ObservableScope} os
+ */
 function observeDevicePixelRatio(os) {
   return os.observe(
     () => window.devicePixelRatio,
@@ -147,9 +146,10 @@ function observeDevicePixelRatio(os) {
 }
 
 /**
- * HTMLCanvas element doesn't inherit some style properties from parent. This means the only way
- * `currentColor` can be used for rendering is when the canvas itself has the color styling set.
- * This observer tracks parent's current color and readjust when browser's color scheme changes.
+ * HTMLCanvas element doesn't inherit some style properties from parent. This
+ * means the only way `currentColor` can be used for rendering is when the
+ * canvas itself has the color styling set. This observer tracks parent's
+ * current color and readjust when browser's color scheme changes.
  *
  * @param {ObservableScope} os
  * @param {HTMLElement} target
@@ -173,11 +173,16 @@ function observeContainerStyle(os, target) {
 }
 
 /**
+ * Rendering area of canvas can be different from its visual element's size.
+ * This function computes proper rendering area size based on devicePixelRatio
+ * and optional scaling factor that can enhance image sharpness (though by
+ * consuming more CPU and RAM).
+ *
  * @param {number} width
  * @param {number} height
  * @param {number} dpr
- * @param {number} [k=1] Additional scale factor that increases image quality by further expanding
- *   canvas area. Default is `1`
+ * @param {number} [k=1] Additional scale factor that increases image quality by
+ *   further expanding canvas area. Default is `1`
  */
 function scaleCanvasArea(width, height, dpr, k = 1) {
   let maxCanvasArea = 2 ** 24; // iOS can't handle more
@@ -194,7 +199,9 @@ function scaleCanvasArea(width, height, dpr, k = 1) {
 }
 
 /**
- * Initialize canvas element to render viz to
+ * Initialize canvas element to render viz to. Parent container assumed to have
+ * `position: relative` style to ensure fewer layout shifts during canvas
+ * rescaling.
  *
  * @param {HTMLElement} container
  */
@@ -225,6 +232,11 @@ function releaseCanvas(target) {
 }
 
 /**
+ * A routine to properly readjust HTMLCanvas size and acquire its 2D rendering
+ * context. This function has additional tricks implemented for triggering
+ * browser's GC cycles and making sure the rendering context exist (there are
+ * known bugs in Webkit that can make it nullable).
+ *
  * @param {HTMLCanvasElement} canvas
  * @param {number} width
  * @param {number} height
@@ -249,6 +261,9 @@ function acquireCanvasContext(canvas, width, height, ratio) {
 }
 
 /**
+ * Iterates over keys of same type objects and returns false if any of
+ * properties are not equal (using Object.is()). Otherwise returns true.
+ *
  * @template [T=object] Default is `object`
  * @param {T} a
  * @param {T} b

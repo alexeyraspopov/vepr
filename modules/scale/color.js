@@ -85,7 +85,7 @@ export let interpolateCividis = /*#__PURE__*/ polynomial(
  * @returns {(t: number) => string}
  */
 function polynomial(r, g, b) {
-  /* In order to create an interpolator for RGB colors, this function receives 
+  /* In order to create an interpolator for RGB colors, this function receives
   coefficients for RGB channels and generate an equation for each of them. */
   return new Function("t", `return \`rgb(\${${eq(r)}},\${${eq(g)}},\${${eq(b)}})\``);
 }
@@ -461,11 +461,11 @@ function interpolateHex(values, t) {
     1. `(value >> shift) & 255` decodes a channel (R/G/B) value out of hex.
        Shift is 16 for Red, 8 for Green, 0 for Blue
     2. `max(0, min(round(value), 255))` ensures the interpolated value is an
-       8 bit integer that represents color channel. 
-    3. Each interpolated channel is shifted back in their position in hex 
+       8 bit integer that represents color channel.
+    3. Each interpolated channel is shifted back in their position in hex
        format, and the result is composed as `r | g | b` expression.
   */
-  let result = 0;
+  let result = 0; // rgb: new Float32Array(3)
   let n = values.length - 1;
   let i = t <= 0 ? (t = 0) : t >= 1 ? ((t = 1), n - 1) : Math.floor(t * n);
   for (let shift = 0; shift <= 16; shift += 8) {

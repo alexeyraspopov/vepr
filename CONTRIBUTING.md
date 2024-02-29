@@ -5,8 +5,8 @@ contributing is not expected at the moment. If you wish to dig into the project
 internals and found yourself making what seem to be meaningful changes, here are
 the conventions to consider before opening a pull request.
 
-1. The code is written in JavaScript following ECMAScript 2015 standard. Just a
-   handful of features from 2015 standard is being used frequently though. The
+1. The code is written in JavaScript following ECMAScript 2017 standard. Just a
+   handful of features from 2017 standard is being used frequently though. The
    code is being shipped as is, no additional compilation happening before
    publishing to NPM registry.
 2. JSDoc syntax is used for most of the functions, public ones in particular.

@@ -1,6 +1,6 @@
-const UNIT = /^[\d\.]+u$/;
-const FRAC = /^[\d\.]+f$/;
-const PERC = /^[\d\.]+%$/;
+const UNIT = /^[\d.]+u$/;
+const FRAC = /^[\d.]+f$/;
+const PERC = /^[\d.]+%$/;
 
 /**
  * Implements one dimensional grid-like layout binning scale.

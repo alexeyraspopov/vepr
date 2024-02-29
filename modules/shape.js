@@ -147,7 +147,7 @@ export function rect(data, transform) {
 }
 
 function constant(value) {
-  return (_) => value;
+  return () => value;
 }
 
 function apply(fn, data, type) {
