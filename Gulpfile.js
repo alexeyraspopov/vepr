@@ -14,6 +14,8 @@ import { Parcel } from "@parcel/core";
 import { ESLint } from "eslint";
 import { createVitest } from "vitest/node";
 
+let isCI = process.env.CI != null;
+
 export let ci = parallel(test, lint);
 
 export async function test() {
@@ -31,7 +33,7 @@ export async function test() {
 
 export async function lint() {
   let { fix } = yargs(process.argv).boolean("fix").parse();
-  let eslint = new ESLint({ fix, cache: true });
+  let eslint = new ESLint({ fix, cache: !isCI });
   let result = await eslint.lintFiles(["modules"]);
   let format = await eslint.loadFormatter("stylish");
   if (fix) await ESLint.outputFixes(result);
@@ -47,6 +49,9 @@ export async function docs() {
     defaultConfig: "@parcel/config-default",
     serveOptions: { port: 3000 },
     hmrOptions: { port: 3000 },
+    defaultTargetOptions: {
+      publicUrl: isCI ? "/vepr" : "/",
+    },
   });
   try {
     return build ? bundler.run() : bundler.watch();
@@ -77,14 +82,7 @@ export async function bundle() {
   ]);
 }
 
-function map(fn) {
-  return async function* process(source) {
-    for await (let file of source)
-      yield file.clone({ contents: Buffer.from(fn(file.contents.toString())) });
-  };
-}
-
-function generateReadme(contents) {
+function generateReadme() {
   return `
 # 🐗 Vepr
 
@@ -143,7 +141,12 @@ function generatePkg(contents) {
 }
 
 export function decls() {
-  return pipeline(src(["build/*.js"]), declarations, prettierdts, dest("build"));
+  return pipeline(
+    src(["build/*.js"]),
+    declarations,
+    map((contents) => format(contents, { parser: "typescript" })),
+    dest("build"),
+  );
 }
 
 async function* declarations(source) {
@@ -164,13 +167,12 @@ async function* declarations(source) {
   for (let file of output) yield file;
 }
 
-async function* prettierdts(source) {
-  for await (let file of source) {
-    let clone = file.clone({ contents: false });
-    let contents = await format(clone.contents.toString(), {
-      parser: "typescript",
-    });
-    clone.contents = Buffer.from(contents);
-    yield clone;
-  }
+function map(fn) {
+  return async function* process(source) {
+    for await (let file of source) {
+      let clone = file.clone({ contents: false });
+      let contents = await fn(file.contents.toString());
+      yield Object.assign(clone, { contents: Buffer.from(contents) });
+    }
+  };
 }

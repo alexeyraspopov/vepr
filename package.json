@@ -28,5 +28,12 @@
   },
   "browserslist": [
     "last 1 Safari version"
-  ]
+  ],
+  "prettier": {
+    "plugins": [
+      "prettier-plugin-jsdoc"
+    ],
+    "jsdocPrintWidth": 80,
+    "proseWrap": "always"
+  }
 }
