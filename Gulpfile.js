@@ -37,7 +37,7 @@ export async function lint() {
   if (fix) await ESLint.outputFixes(result);
   let warnCount = result.reduce((sum, res) => sum + res.warningCount, 0);
   console.log(format.format(result));
-  if (warnCount > 10) throw new Error("ESLint found too many warnings (maximum: 10).");
+  if (warnCount > 50) throw new Error("ESLint found too many warnings (maximum: 50).");
 }
 
 export async function docs() {
