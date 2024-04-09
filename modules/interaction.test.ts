@@ -2,15 +2,13 @@ import { test, expect } from "vitest";
 import { brush } from "./interaction.js";
 
 test("brush", () => {
-  let ctl = brush(
-    [
-      [0, 0],
-      [200, 100],
-    ],
-    ["x", "y"],
-  );
+  let ctl = brush("xy");
+  ctl.extent([
+    [0, 0],
+    [200, 100],
+  ]);
 
-  expect(ctl.get()).toEqual(null);
+  expect(ctl.get()).toEqual(undefined);
 
   ctl.down(10, 10);
   ctl.move(40, 40);

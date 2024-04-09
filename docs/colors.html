@@ -66,20 +66,19 @@
       <div class="scheme"></div>
     </section>
     <script type="module">
-      import { renderColorRamp, renderColorScheme } from "./colors";
-      import { interpolateBlues, schemeBlues } from "../modules";
+      import { renderColorRamp, renderColorScheme } from "./colors.ts";
+      import { interpolateBlues, schemeBlues } from "../modules/index.js";
       renderColorRamp(window.colorBlues.querySelector(".ramp"), interpolateBlues);
       renderColorScheme(window.colorBlues.querySelector(".scheme"), schemeBlues);
     </script>
-
     <section id="colorGreens">
       <p>interpolateGreens(t)</p>
       <div class="ramp"></div>
-      <p>schemeBlues(n)</p>
+      <p>schemeGreens(n)</p>
       <div class="scheme"></div>
     </section>
     <script type="module">
-      import { renderColorRamp, renderColorScheme } from "./colors";
+      import { renderColorRamp, renderColorScheme } from "./colors.ts";
       import { interpolateGreens, schemeGreens } from "../modules";
       renderColorRamp(window.colorGreens.querySelector(".ramp"), interpolateGreens);
       renderColorScheme(window.colorGreens.querySelector(".scheme"), schemeGreens);
@@ -88,11 +87,11 @@
     <section id="colorGreys">
       <p>interpolateGreys(t)</p>
       <div class="ramp"></div>
-      <p>schemeBlues(n)</p>
+      <p>schemeGreys(n)</p>
       <div class="scheme"></div>
     </section>
     <script type="module">
-      import { renderColorRamp, renderColorScheme } from "./colors";
+      import { renderColorRamp, renderColorScheme } from "./colors.ts";
       import { interpolateGreys, schemeGreys } from "../modules";
       renderColorRamp(window.colorGreys.querySelector(".ramp"), interpolateGreys);
       renderColorScheme(window.colorGreys.querySelector(".scheme"), schemeGreys);
@@ -101,11 +100,11 @@
     <section id="colorOranges">
       <p>interpolateOranges(t)</p>
       <div class="ramp"></div>
-      <p>schemeBlues(n)</p>
+      <p>schemeOranges(n)</p>
       <div class="scheme"></div>
     </section>
     <script type="module">
-      import { renderColorRamp, renderColorScheme } from "./colors";
+      import { renderColorRamp, renderColorScheme } from "./colors.ts";
       import { interpolateOranges, schemeOranges } from "../modules";
       renderColorRamp(window.colorOranges.querySelector(".ramp"), interpolateOranges);
       renderColorScheme(window.colorOranges.querySelector(".scheme"), schemeOranges);
@@ -114,11 +113,11 @@
     <section id="colorPurples">
       <p>interpolatePurples(t)</p>
       <div class="ramp"></div>
-      <p>schemeBlues(n)</p>
+      <p>schemePurples(n)</p>
       <div class="scheme"></div>
     </section>
     <script type="module">
-      import { renderColorRamp, renderColorScheme } from "./colors";
+      import { renderColorRamp, renderColorScheme } from "./colors.ts";
       import { interpolatePurples, schemePurples } from "../modules";
       renderColorRamp(window.colorPurples.querySelector(".ramp"), interpolatePurples);
       renderColorScheme(window.colorPurples.querySelector(".scheme"), schemePurples);
@@ -127,11 +126,11 @@
     <section id="colorReds">
       <p>interpolateReds(t)</p>
       <div class="ramp"></div>
-      <p>schemeBlues(n)</p>
+      <p>schemeReds(n)</p>
       <div class="scheme"></div>
     </section>
     <script type="module">
-      import { renderColorRamp, renderColorScheme } from "./colors";
+      import { renderColorRamp, renderColorScheme } from "./colors.ts";
       import { interpolateReds, schemeReds } from "../modules";
       renderColorRamp(window.colorReds.querySelector(".ramp"), interpolateReds);
       renderColorScheme(window.colorReds.querySelector(".scheme"), schemeReds);
@@ -140,11 +139,11 @@
     <section id="colorBuGn">
       <p>interpolateBuGn(t)</p>
       <div class="ramp"></div>
-      <p>schemeBlues(n)</p>
+      <p>schemeBuGn(n)</p>
       <div class="scheme"></div>
     </section>
     <script type="module">
-      import { renderColorRamp, renderColorScheme } from "./colors";
+      import { renderColorRamp, renderColorScheme } from "./colors.ts";
       import { interpolateBuGn, schemeBuGn } from "../modules";
       renderColorRamp(window.colorBuGn.querySelector(".ramp"), interpolateBuGn);
       renderColorScheme(window.colorBuGn.querySelector(".scheme"), schemeBuGn);
@@ -153,11 +152,11 @@
     <section id="colorBuPu">
       <p>interpolateBuPu(t)</p>
       <div class="ramp"></div>
-      <p>schemeBlues(n)</p>
+      <p>schemeBuPu(n)</p>
       <div class="scheme"></div>
     </section>
     <script type="module">
-      import { renderColorRamp, renderColorScheme } from "./colors";
+      import { renderColorRamp, renderColorScheme } from "./colors.ts";
       import { interpolateBuPu, schemeBuPu } from "../modules";
       renderColorRamp(window.colorBuPu.querySelector(".ramp"), interpolateBuPu);
       renderColorScheme(window.colorBuPu.querySelector(".scheme"), schemeBuPu);
@@ -166,11 +165,11 @@
     <section id="colorGnBu">
       <p>interpolateGnBu(t)</p>
       <div class="ramp"></div>
-      <p>schemeBlues(n)</p>
+      <p>schemeGnBu(n)</p>
       <div class="scheme"></div>
     </section>
     <script type="module">
-      import { renderColorRamp, renderColorScheme } from "./colors";
+      import { renderColorRamp, renderColorScheme } from "./colors.ts";
       import { interpolateGnBu, schemeGnBu } from "../modules";
       renderColorRamp(window.colorGnBu.querySelector(".ramp"), interpolateGnBu);
       renderColorScheme(window.colorGnBu.querySelector(".scheme"), schemeGnBu);
@@ -179,11 +178,11 @@
     <section id="colorOrRd">
       <p>interpolateOrRd(t)</p>
       <div class="ramp"></div>
-      <p>schemeBlues(n)</p>
+      <p>schemeOrRd(n)</p>
       <div class="scheme"></div>
     </section>
     <script type="module">
-      import { renderColorRamp, renderColorScheme } from "./colors";
+      import { renderColorRamp, renderColorScheme } from "./colors.ts";
       import { interpolateOrRd, schemeOrRd } from "../modules";
       renderColorRamp(window.colorOrRd.querySelector(".ramp"), interpolateOrRd);
       renderColorScheme(window.colorOrRd.querySelector(".scheme"), schemeOrRd);
@@ -192,11 +191,11 @@
     <section id="colorPuBu">
       <p>interpolatePuBu(t)</p>
       <div class="ramp"></div>
-      <p>schemeBlues(n)</p>
+      <p>schemePuBu(n)</p>
       <div class="scheme"></div>
     </section>
     <script type="module">
-      import { renderColorRamp, renderColorScheme } from "./colors";
+      import { renderColorRamp, renderColorScheme } from "./colors.ts";
       import { interpolatePuBu, schemePuBu } from "../modules";
       renderColorRamp(window.colorPuBu.querySelector(".ramp"), interpolatePuBu);
       renderColorScheme(window.colorPuBu.querySelector(".scheme"), schemePuBu);
@@ -205,11 +204,11 @@
     <section id="colorPuBuGn">
       <p>interpolatePuBuGn(t)</p>
       <div class="ramp"></div>
-      <p>schemeBlues(n)</p>
+      <p>schemePuBuGn(n)</p>
       <div class="scheme"></div>
     </section>
     <script type="module">
-      import { renderColorRamp, renderColorScheme } from "./colors";
+      import { renderColorRamp, renderColorScheme } from "./colors.ts";
       import { interpolatePuBuGn, schemePuBuGn } from "../modules";
       renderColorRamp(window.colorPuBuGn.querySelector(".ramp"), interpolatePuBuGn);
       renderColorScheme(window.colorPuBuGn.querySelector(".scheme"), schemePuBuGn);
@@ -218,11 +217,11 @@
     <section id="colorPuRd">
       <p>interpolatePuRd(t)</p>
       <div class="ramp"></div>
-      <p>schemeBlues(n)</p>
+      <p>schemePuRd(n)</p>
       <div class="scheme"></div>
     </section>
     <script type="module">
-      import { renderColorRamp, renderColorScheme } from "./colors";
+      import { renderColorRamp, renderColorScheme } from "./colors.ts";
       import { interpolatePuRd, schemePuRd } from "../modules";
       renderColorRamp(window.colorPuRd.querySelector(".ramp"), interpolatePuRd);
       renderColorScheme(window.colorPuRd.querySelector(".scheme"), schemePuRd);
@@ -231,11 +230,11 @@
     <section id="colorRdPu">
       <p>interpolateRdPu(t)</p>
       <div class="ramp"></div>
-      <p>schemeBlues(n)</p>
+      <p>schemeRdPu(n)</p>
       <div class="scheme"></div>
     </section>
     <script type="module">
-      import { renderColorRamp, renderColorScheme } from "./colors";
+      import { renderColorRamp, renderColorScheme } from "./colors.ts";
       import { interpolateRdPu, schemeRdPu } from "../modules";
       renderColorRamp(window.colorRdPu.querySelector(".ramp"), interpolateRdPu);
       renderColorScheme(window.colorRdPu.querySelector(".scheme"), schemeRdPu);
@@ -244,11 +243,11 @@
     <section id="colorYlGn">
       <p>interpolateYlGn(t)</p>
       <div class="ramp"></div>
-      <p>schemeBlues(n)</p>
+      <p>schemeYlGn(n)</p>
       <div class="scheme"></div>
     </section>
     <script type="module">
-      import { renderColorRamp, renderColorScheme } from "./colors";
+      import { renderColorRamp, renderColorScheme } from "./colors.ts";
       import { interpolateYlGn, schemeYlGn } from "../modules";
       renderColorRamp(window.colorYlGn.querySelector(".ramp"), interpolateYlGn);
       renderColorScheme(window.colorYlGn.querySelector(".scheme"), schemeYlGn);
@@ -257,11 +256,11 @@
     <section id="colorYlGnBu">
       <p>interpolateYlGnBu(t)</p>
       <div class="ramp"></div>
-      <p>schemeBlues(n)</p>
+      <p>schemeYlGnBu(n)</p>
       <div class="scheme"></div>
     </section>
     <script type="module">
-      import { renderColorRamp, renderColorScheme } from "./colors";
+      import { renderColorRamp, renderColorScheme } from "./colors.ts";
       import { interpolateYlGnBu, schemeYlGnBu } from "../modules";
       renderColorRamp(window.colorYlGnBu.querySelector(".ramp"), interpolateYlGnBu);
       renderColorScheme(window.colorYlGnBu.querySelector(".scheme"), schemeYlGnBu);
@@ -270,11 +269,11 @@
     <section id="colorYlOrBr">
       <p>interpolateYlOrBr(t)</p>
       <div class="ramp"></div>
-      <p>schemeBlues(n)</p>
+      <p>schemeYlOrBr(n)</p>
       <div class="scheme"></div>
     </section>
     <script type="module">
-      import { renderColorRamp, renderColorScheme } from "./colors";
+      import { renderColorRamp, renderColorScheme } from "./colors.ts";
       import { interpolateYlOrBr, schemeYlOrBr } from "../modules";
       renderColorRamp(window.colorYlOrBr.querySelector(".ramp"), interpolateYlOrBr);
       renderColorScheme(window.colorYlOrBr.querySelector(".scheme"), schemeYlOrBr);
@@ -283,11 +282,11 @@
     <section id="colorYlOrRd">
       <p>interpolateYlOrRd(t)</p>
       <div class="ramp"></div>
-      <p>schemeBlues(n)</p>
+      <p>schemeYlOrRd(n)</p>
       <div class="scheme"></div>
     </section>
     <script type="module">
-      import { renderColorRamp, renderColorScheme } from "./colors";
+      import { renderColorRamp, renderColorScheme } from "./colors.ts";
       import { interpolateYlOrRd, schemeYlOrRd } from "../modules";
       renderColorRamp(window.colorYlOrRd.querySelector(".ramp"), interpolateYlOrRd);
       renderColorScheme(window.colorYlOrRd.querySelector(".scheme"), schemeYlOrRd);
@@ -299,7 +298,7 @@
       <p>interpolateBrBG(t)</p>
     </section>
     <script type="module">
-      import { renderColorRamp } from "./colors";
+      import { renderColorRamp } from "./colors.ts";
       import { interpolateBrBG } from "../modules";
       renderColorRamp(window.colorBrBG, interpolateBrBG);
     </script>
@@ -308,7 +307,7 @@
       <p>interpolatePiYG(t)</p>
     </section>
     <script type="module">
-      import { renderColorRamp } from "./colors";
+      import { renderColorRamp } from "./colors.ts";
       import { interpolatePiYG } from "../modules";
       renderColorRamp(window.colorPiYG, interpolatePiYG);
     </script>
@@ -317,7 +316,7 @@
       <p>interpolatePRGn(t)</p>
     </section>
     <script type="module">
-      import { renderColorRamp } from "./colors";
+      import { renderColorRamp } from "./colors.ts";
       import { interpolatePRGn } from "../modules";
       renderColorRamp(window.colorPRGn, interpolatePRGn);
     </script>
@@ -326,7 +325,7 @@
       <p>interpolatePuOr(t)</p>
     </section>
     <script type="module">
-      import { renderColorRamp } from "./colors";
+      import { renderColorRamp } from "./colors.ts";
       import { interpolatePuOr } from "../modules";
       renderColorRamp(window.colorPuOr, interpolatePuOr);
     </script>
@@ -335,7 +334,7 @@
       <p>interpolateRdBu(t)</p>
     </section>
     <script type="module">
-      import { renderColorRamp } from "./colors";
+      import { renderColorRamp } from "./colors.ts";
       import { interpolateRdBu } from "../modules";
       renderColorRamp(window.colorRdBu, interpolateRdBu);
     </script>
@@ -344,7 +343,7 @@
       <p>interpolateRdGy(t)</p>
     </section>
     <script type="module">
-      import { renderColorRamp } from "./colors";
+      import { renderColorRamp } from "./colors.ts";
       import { interpolateRdGy } from "../modules";
       renderColorRamp(window.colorRdGy, interpolateRdGy);
     </script>
@@ -353,7 +352,7 @@
       <p>interpolateRdYlBu(t)</p>
     </section>
     <script type="module">
-      import { renderColorRamp } from "./colors";
+      import { renderColorRamp } from "./colors.ts";
       import { interpolateRdYlBu } from "../modules";
       renderColorRamp(window.colorRdYlBu, interpolateRdYlBu);
     </script>
@@ -362,7 +361,7 @@
       <p>interpolateRdYlGn(t)</p>
     </section>
     <script type="module">
-      import { renderColorRamp } from "./colors";
+      import { renderColorRamp } from "./colors.ts";
       import { interpolateRdYlGn } from "../modules";
       renderColorRamp(window.colorRdYlGn, interpolateRdYlGn);
     </script>
@@ -371,7 +370,7 @@
       <p>interpolateSpectral(t)</p>
     </section>
     <script type="module">
-      import { renderColorRamp } from "./colors";
+      import { renderColorRamp } from "./colors.ts";
       import { interpolateSpectral } from "../modules";
       renderColorRamp(window.colorSpectral, interpolateSpectral);
     </script>

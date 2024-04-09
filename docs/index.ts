@@ -53,12 +53,16 @@ export function sampleOrdDotPlot(container: HTMLElement) {
 }
 
 export function sampleLinePlot(container: HTMLElement) {
-  let data = Array.from({ length: 1000 }, (_, index) => index).reduce((acc, index) => {
-    return acc.concat({
-      index,
-      value: index === 0 ? Math.random() * 100 : acc[acc.length - 1].value + Math.random() * 10 - 5,
-    });
-  }, [] as { index: number; value: number }[]);
+  let data = Array.from({ length: 1000 }, (_, index) => index).reduce(
+    (acc, index) => {
+      return acc.concat({
+        index,
+        value:
+          index === 0 ? Math.random() * 100 : acc[acc.length - 1].value + Math.random() * 10 - 5,
+      });
+    },
+    [] as { index: number; value: number }[],
+  );
 
   let bp = blueprint({
     y: { type: "numeral", domain: [0, 150] },
@@ -84,6 +88,7 @@ export function sampleBarPlot(container: HTMLElement, flow: "x" | "y") {
   let bp =
     flow === "y"
       ? blueprint({
+          x: { type: "ordinal", domain: ["A", "B", "C", "D", "E", "F"] },
           y: { type: "numeral", domain: [0, 13] },
           marks: [barY(data, identity({ x: "letter", y: "frequency" }, { sort: order }))],
         })

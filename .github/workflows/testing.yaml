@@ -16,5 +16,4 @@ jobs:
       - run: npm install
       - run: npx playwright install-deps
       - run: npx playwright install
-      - run: npm run lint
-      - run: npm run test
+      - run: npx gulp ci

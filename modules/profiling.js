@@ -1,25 +1,17 @@
 let profilingEnabled = false;
 
-let observer = new PerformanceObserver((list) => {
-  let entries = list.getEntries().filter((entry) => entry.name.startsWith("vepr/"));
-  let maxLength = entries.reduce((l, e) => Math.max(l, e.name.length - 5), 0);
-  console.log(
-    "%c" +
-      entries
-        .map(
-          (entry) =>
-            `| ${entry.name.slice(5).padEnd(maxLength, " ")} | ${entry.duration
-              .toString()
-              .padEnd(20, " ")} |`,
-        )
-        .join("\n"),
-    "font-family: monospace",
-  );
+let observer = new PerformanceObserver((entries) => {
+  console.table(entries.getEntries().filter(selectVeprEntry), ["name", "duration"]);
 });
+
+/** @param {PerformanceEntry} entry */
+function selectVeprEntry(entry) {
+  return entry.name.startsWith("vepr/");
+}
 
 /** @param {boolean} enabled */
 export function toggleProfiling(enabled) {
-  profilingEnabled = enabled;
+  profilingEnabled = enabled && typeof performance !== "undefined";
   if (enabled) {
     observer.observe({ entryTypes: ["measure"], durationThreshold: 5000 });
   } else {
@@ -29,13 +21,15 @@ export function toggleProfiling(enabled) {
 
 /** @param {string} name */
 export function markStart(name) {
-  if (!profilingEnabled) return;
-  performance.mark("vepr/start-" + name);
+  if (profilingEnabled) {
+    performance.mark("vepr/start-" + name);
+  }
 }
 
 /** @param {string} name */
 export function markFinish(name) {
-  if (!profilingEnabled) return;
-  performance.mark("vepr/finish-" + name);
-  performance.measure("vepr/" + name, "vepr/start-" + name, "vepr/finish-" + name);
+  if (profilingEnabled) {
+    performance.mark("vepr/finish-" + name);
+    performance.measure("vepr/" + name, "vepr/start-" + name, "vepr/finish-" + name);
+  }
 }

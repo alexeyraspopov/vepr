@@ -13,7 +13,10 @@ export { pow, log, symlog } from "./scale/number.js";
 
 export { toggleProfiling } from "./profiling.js";
 
-export { brush } from "./interaction.js";
+export { brush, zoom } from "./interaction.js";
+
+import { dot, line, rect } from "./shape.js";
+export let shape = { dot, line, rect };
 
 export {
   interpolateLinear,

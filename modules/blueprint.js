@@ -28,9 +28,9 @@ export function blueprint(options) {
         } else {
           let union = vars[key].domain.concat(local[key].domain);
           if (vars[key].type === "numeral") {
-            vars[key] = { ...vars[key], domain: extent(union) };
+            vars[key] = Object.assign({}, vars[key], { domain: extent(union) });
           } else if (vars[key].type === "ordinal") {
-            vars[key] = { ...vars[key], domain: unique(union) };
+            vars[key] = Object.assign({}, vars[key], { domain: unique(union) });
           }
         }
       }

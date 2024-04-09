@@ -1,4 +1,4 @@
-import { min, max, ascending } from "./array.js";
+import { min, max, ascending, identity } from "./array.js";
 
 /**
  * Quantile of population
@@ -7,12 +7,12 @@ import { min, max, ascending } from "./array.js";
  * @template [R=T] Default is `T`
  * @param {T[]} values
  * @param {number} p
- * @param {(value: T, index?: number, values?: T[]) => R} [valueOf=identity] Default is `identity`
+ * @param {(value: T) => R} [valueOf=identity] Default is `identity`
  * @returns {number}
  */
-export function quantile(values, p, valueOf = identityDatum) {
-  let n = values.length;
-  let vs = Float64Array.from(numbers(values, valueOf));
+export function quantile(values, p, valueOf = identity) {
+  let vs = ArrayBuffer.isView(values) ? values : Float64Array.from(numbers(values, valueOf));
+  let n = vs.length;
   if (n === 0) return;
   if ((p = +p) <= 0 || n < 2) return min(vs);
   if (p >= 1) return max(vs);
@@ -23,8 +23,8 @@ export function quantile(values, p, valueOf = identityDatum) {
   return value0 + (value1 - value0) * (i - i0);
 }
 
-export function quantileSorted(values, p, valueOf = identityDatum) {
-  var n = values.length;
+export function quantileSorted(values, p, valueOf = identity) {
+  let n = values.length;
   if (p <= 0 || n < 2) return +valueOf(values[0], 0, values);
   if (p >= 1) return +valueOf(values[n - 1], n - 1, values);
   let i = (n - 1) * p;
@@ -36,7 +36,7 @@ export function quantileSorted(values, p, valueOf = identityDatum) {
 
 export function medianAbsoluteDeviation(values) {
   let m = quantile(values, 0.5);
-  let dev = values.map((v) => Math.abs(v - m));
+  let dev = Array.from(values, (v) => Math.abs(v - m));
   let mad = quantile(dev, 0.5);
   return mad;
 }
@@ -48,9 +48,8 @@ export function interQuartileRange(values) {
 }
 
 function* numbers(values, valueOf) {
-  for (let index = 0; index < values.length; index++) {
-    let value = valueOf(values[index], index, values);
-    if (value != null && (value = +value) >= value) yield value;
+  for (let value of values) {
+    if ((value = valueOf(value)) != null && (value = +value) >= value) yield value;
   }
 }
 

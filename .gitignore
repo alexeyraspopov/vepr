@@ -2,3 +2,6 @@ build
 node_modules
 dist
 coverage
+sandbox
+.parcel-cache
+.eslintcache

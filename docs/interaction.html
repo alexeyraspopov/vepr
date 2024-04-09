@@ -19,6 +19,7 @@
         transform: translate(-50%, -50%);
         font-style: italic;
         opacity: 0.3;
+        pointer-events: none;
       }
     </style>
   </head>
@@ -59,10 +60,20 @@
       ></svg>
     </div>
 
+    <p>
+      Another example shows the use of Zoom controls. Try dragging content and scroll in/out in the
+      section below.
+    </p>
+
+    <div class="canvas-container zoom-container">
+      <canvas style="width: 100%; height: 100%; display: block" id="zoomingContainer"></canvas>
+    </div>
+
     <script type="module">
-      import { applyBrushing } from "./interaction.ts";
-      applyBrushing(window.brushingContainer, ["x", "y"], 20);
-      applyBrushing(window.brushingContainerX, ["x"], 0);
+      import { applyBrushing, applyZooming } from "./interaction.ts";
+      applyBrushing(window.brushingContainer, "xy", 20);
+      applyBrushing(window.brushingContainerX, "x", 0);
+      applyZooming(window.zoomingContainer);
     </script>
 
     <footer><p>ISC License &copy; 2022–2024 Oleksii Raspopov</p></footer>

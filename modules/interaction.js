@@ -1,37 +1,49 @@
-const [N, S, W, E] = [0b0001, 0b0010, 0b0100, 0b1000];
+const [North, South, West, East, Inside, Outside, Outbound] = [
+  0b0000001, 0b0000010, 0b0000100, 0b0001000, 0b0010000, 0b0100000, 0b1000000,
+];
 
 /**
  * Brush allows gestures within controlled bounded space in unbounded cartesian
  * coordinates
  *
- * @param {[[number, number], [number, number]]} extent Top left and right
- *   bottom points of available space
- * @param {("x" | "y")[]} dimensions Gesture constraints
+ * @param {"x" | "y" | "xy"} dimensions Gesture constraints
  */
-export function brush(extent, dimensions) {
-  let [[x0, y0], [x1, y1]] = extent;
+export function brush(dimensions) {
+  let x0, y0, x1, y1, constraints;
+  let startX, startY;
   let allowsX = dimensions.includes("x");
   let allowsY = dimensions.includes("y");
-  let startX, startY;
   let state = "idle";
-  let selection = null;
-  let snapshot;
-  let offset = 6;
-  let handle = null;
+  let selection, snapshot;
+  let handle = Outbound;
+
+  /**
+   * @param {[[number, number], [number, number]]} extent Top left and right
+   *   bottom points of available space
+   */
+  function extent(extent) {
+    [[x0, y0], [x1, y1]] = extent;
+    constraints = extent;
+  }
 
   function down(x, y) {
     startX = x;
     startY = y;
-    state =
-      selection == null
-        ? "select"
-        : within(x, selection[0][0] + offset / 2, selection[1][0] - offset / 2) &&
-            within(y, selection[0][1] + offset / 2, selection[1][1] - offset / 2)
-          ? "drag"
-          : (handle = aligned([x, y], selection, offset, allowsX, allowsY))
-            ? "resize"
-            : "select";
     snapshot = selection;
+    handle =
+      selection != null
+        ? alignment(x, y, selection, allowsX, allowsY, constraints)
+        : x0 < x && x < x1 && y0 < y && y < y1
+          ? Outside
+          : Outbound;
+    state =
+      handle === Outbound
+        ? "idle"
+        : handle === Outside
+          ? "select"
+          : handle === Inside
+            ? "drag"
+            : "resize";
   }
 
   function move(x, y) {
@@ -40,10 +52,9 @@ export function brush(extent, dimensions) {
       let newX1 = allowsX ? Math.min(Math.max(x, startX), x1) : x1;
       let newY0 = allowsY ? Math.max(y0, Math.min(y, startY)) : y0;
       let newY1 = allowsY ? Math.min(Math.max(y, startY), y1) : y1;
-      selection = [
-        [newX0, newY0],
-        [newX1, newY1],
-      ];
+      let new0 = [newX0, newY0];
+      let new1 = [newX1, newY1];
+      selection = [new0, new1];
     }
     if (state === "drag") {
       let dx = x - startX;
@@ -58,48 +69,43 @@ export function brush(extent, dimensions) {
       let newX1 = allowsX ? candidateX1 + adjustX : x1;
       let newY0 = allowsY ? candidateY0 + adjustY : y0;
       let newY1 = allowsY ? candidateY1 + adjustY : y1;
-      selection = [
-        [newX0, newY0],
-        [newX1, newY1],
-      ];
+      let new0 = [newX0, newY0];
+      let new1 = [newX1, newY1];
+      selection = [new0, new1];
     }
     if (state === "resize") {
-      let resizeX = allowsX && handle & (W + E);
-      let resizeY = allowsY && handle & (N + S);
-      let startX = resizeX ? snapshot[handle & E ? 0 : 1][0] : null;
-      let startY = resizeY ? snapshot[handle & S ? 0 : 1][1] : null;
+      let resizeX = allowsX && handle & (West + East);
+      let resizeY = allowsY && handle & (North + South);
+      let startX = resizeX ? snapshot[handle & East ? 0 : 1][0] : NaN;
+      let startY = resizeY ? snapshot[handle & South ? 0 : 1][1] : NaN;
       let newX0 = resizeX ? Math.max(x0, Math.min(x, startX)) : snapshot[0][0];
       let newX1 = resizeX ? Math.min(Math.max(x, startX), x1) : snapshot[1][0];
       let newY0 = resizeY ? Math.max(y0, Math.min(y, startY)) : snapshot[0][1];
       let newY1 = resizeY ? Math.min(Math.max(y, startY), y1) : snapshot[1][1];
-      selection = [
-        [newX0, newY0],
-        [newX1, newY1],
-      ];
+      let new0 = [newX0, newY0];
+      let new1 = [newX1, newY1];
+      selection = [new0, new1];
     }
   }
 
   function up(x, y) {
     state = "idle";
-    snapshot = null;
-    handle = null;
   }
 
-  function cursor(point) {
-    if (selection == null || point == null) return "crosshair";
-    let [xa, ya] = point;
-    let [[x0, y0], [x1, y1]] = selection;
-    let insideX = within(xa, x0, x1);
-    let insideY = within(ya, y0, y1);
-    let alignedW = allowsX && within(xa, x0 - offset / 2, x0 + offset / 2);
-    let alignedE = allowsX && within(xa, x1 - offset / 2, x1 + offset / 2);
-    let alignedN = allowsY && within(ya, y0 - offset / 2, y0 + offset / 2);
-    let alignedS = allowsY && within(ya, y1 - offset / 2, y1 + offset / 2);
-    if ((alignedN && alignedW) || (alignedS && alignedE)) return "nwse-resize";
-    if ((alignedN && alignedE) || (alignedS && alignedW)) return "nesw-resize";
-    if ((alignedN || alignedS) && insideX) return "ns-resize";
-    if ((alignedE || alignedW) && insideY) return "ew-resize";
-    if (insideX && insideY) return "move";
+  function cursor(x, y) {
+    let handle =
+      selection != null
+        ? alignment(x, y, selection, allowsX, allowsY, constraints)
+        : x0 < x && x < x1 && y0 < y && y < y1
+          ? Outside
+          : Outbound;
+    console.log(x0, x, x1, handle);
+    if (handle === North + West || handle === South + East) return "nwse-resize";
+    if (handle === North + East || handle === South + West) return "nesw-resize";
+    if (handle === North || handle === South) return "ns-resize";
+    if (handle === East || handle === West) return "ew-resize";
+    if (handle === Inside) return "move";
+    if (handle === Outbound) return "auto";
     return "crosshair";
   }
 
@@ -107,27 +113,67 @@ export function brush(extent, dimensions) {
     return selection;
   }
 
-  return { down, move, up, cursor, get };
+  function idle() {
+    return state === "idle";
+  }
+
+  return { extent, down, move, up, cursor, get, idle };
 }
 
-function within(x, a, b) {
-  return a < x && x < b;
+const threshold = 3;
+
+function alignment(xa, ya, [[x0, y0], [x1, y1]], allowsX, allowsY, constraints) {
+  let inboundX = constraints[0][0] < xa && xa < constraints[1][0];
+  let inboundY = constraints[0][1] < ya && ya < constraints[1][1];
+  if (!inboundX || !inboundY) return Outbound;
+  let insideX = x0 < xa && xa < x1;
+  let insideY = y0 < ya && ya < y1;
+  let alignedW = allowsX && Math.abs(xa - x0) < threshold;
+  let alignedE = allowsX && Math.abs(xa - x1) < threshold;
+  let alignedN = allowsY && Math.abs(ya - y0) < threshold;
+  let alignedS = allowsY && Math.abs(ya - y1) < threshold;
+  if (alignedN && alignedW) return North + West;
+  if (alignedS && alignedE) return South + East;
+  if (alignedN && alignedE) return North + East;
+  if (alignedS && alignedW) return South + West;
+  if (alignedN && insideX) return North;
+  if (alignedS && insideX) return South;
+  if (alignedW && insideY) return West;
+  if (alignedE && insideY) return East;
+  if (insideX && insideY) return Inside;
+  return Outside;
 }
 
-function aligned([xa, ya], [[x0, y0], [x1, y1]], offset, allowsX, allowsY) {
-  let insideX = within(xa, x0, x1);
-  let insideY = within(ya, y0, y1);
-  let alignedW = allowsX && within(xa, x0 - offset / 2, x0 + offset / 2);
-  let alignedE = allowsX && within(xa, x1 - offset / 2, x1 + offset / 2);
-  let alignedN = allowsY && within(ya, y0 - offset / 2, y0 + offset / 2);
-  let alignedS = allowsY && within(ya, y1 - offset / 2, y1 + offset / 2);
-  if (alignedN && alignedW) return N + W;
-  if (alignedS && alignedE) return S + E;
-  if (alignedN && alignedE) return N + E;
-  if (alignedS && alignedW) return S + W;
-  if (alignedN && insideX) return N;
-  if (alignedS && insideX) return S;
-  if (alignedW && insideY) return W;
-  if (alignedE && insideY) return E;
-  return null;
+export function zoom(translateExtent, scaleExtent) {
+  let [[x0, y0], [x1, y1]] = translateExtent;
+  let [k0, k1] = scaleExtent;
+  let state = [1, 0, 0];
+  let snapshot = null;
+  let startX, startY;
+
+  function down(x, y) {
+    startX = x;
+    startY = y;
+    snapshot = state;
+  }
+
+  function move(x, y) {
+    let [_k, _x, _y] = snapshot;
+    state = [_k, _x + _k * (x - startX), _y + _k * (y - startY)];
+  }
+
+  function up(x, y) {
+    snapshot = null;
+  }
+
+  function scale(k) {
+    let [_k, _x, _y] = state;
+    state = [_k * k, _x, _y];
+  }
+
+  function get() {
+    return state;
+  }
+
+  return { down, move, up, scale, get };
 }

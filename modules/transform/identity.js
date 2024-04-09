@@ -21,11 +21,12 @@ export function identity(encodings, options = {}) {
     let index = Uint32Array.from(data, (_, i) => i);
     let bitset = Uint32Array.from({ length: Math.ceil(data.length / 32) });
     if ("filter" in options) {
-      index.forEach((index) => {
-        if (options.filter(data[index], index)) {
-          bitset[index >> 5] |= 0x80000000 >>> index;
+      for (let i = 0; i < index.length; i++) {
+        let v = index[i];
+        if (options.filter(data[v], v)) {
+          bitset[v >> 5] |= 0x80000000 >>> v;
         }
-      });
+      }
     } else {
       bitset.fill(0xffffffff);
     }
