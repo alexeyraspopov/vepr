@@ -99,7 +99,6 @@ export function brush(dimensions) {
         : x0 < x && x < x1 && y0 < y && y < y1
           ? Outside
           : Outbound;
-    console.log(x0, x, x1, handle);
     if (handle === North + West || handle === South + East) return "nwse-resize";
     if (handle === North + East || handle === South + West) return "nesw-resize";
     if (handle === North || handle === South) return "ns-resize";

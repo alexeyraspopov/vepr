@@ -1,4 +1,5 @@
-import { test, expect } from "vitest";
+import { test } from "node:test";
+import { equal, throws } from "node:assert/strict";
 import { ObservableScope } from "./observable.js";
 
 test("observable + computed", () => {
@@ -8,15 +9,15 @@ test("observable + computed", () => {
   let b = os.computed(() => a() * 2);
   let c = os.computed(() => a() + b());
 
-  expect(a()).toEqual(0);
-  expect(b()).toEqual(0);
-  expect(c()).toEqual(0);
+  equal(a(), 0);
+  equal(b(), 0);
+  equal(c(), 0);
 
   a(10);
 
-  expect(a()).toEqual(10);
-  expect(b()).toEqual(20);
-  expect(c()).toEqual(30);
+  equal(a(), 10);
+  equal(b(), 20);
+  equal(c(), 30);
 });
 
 test("computed as derived", () => {
@@ -26,20 +27,20 @@ test("computed as derived", () => {
   let b = os.computed(() => a() * 2);
   let c = os.computed(() => a() + b());
 
-  expect(a()).toEqual(0);
-  expect(b()).toEqual(0);
-  expect(c()).toEqual(0);
+  equal(a(), 0);
+  equal(b(), 0);
+  equal(c(), 0);
 
   b(10);
 
-  expect(b()).toEqual(10);
-  expect(c()).toEqual(10);
+  equal(b(), 10);
+  equal(c(), 10);
 
   a(20);
 
-  expect(a()).toEqual(20);
-  expect(b()).toEqual(40);
-  expect(c()).toEqual(60);
+  equal(a(), 20);
+  equal(b(), 40);
+  equal(c(), 60);
 });
 
 test("observe + watch", () => {
@@ -55,7 +56,7 @@ test("observe + watch", () => {
     },
   );
 
-  expect(a()).toEqual(0);
+  equal(a(), 0);
 
   let received;
   let cleared = 0;
@@ -67,43 +68,42 @@ test("observe + watch", () => {
   });
   let c = os.computed(() => a());
 
-  expect(received).toEqual(0);
+  equal(received, 0);
 
   source = 13;
   et.dispatchEvent(new Event("update"));
 
-  expect(a()).toEqual(13);
-  expect(received).toEqual(13);
-  expect(c()).toEqual(13);
-  expect(cleared).toEqual(1);
+  equal(a(), 13);
+  equal(received, 13);
+  equal(c(), 13);
+  equal(cleared, 1);
 
   b();
 
   source = 100;
   et.dispatchEvent(new Event("update"));
 
-  expect(a()).toEqual(100);
-  expect(received).toEqual(13);
-  expect(c()).toEqual(100);
-  expect(cleared).toEqual(2);
+  equal(a(), 100);
+  equal(received, 13);
+  equal(c(), 100);
+  equal(cleared, 2);
 
   os.dispose();
 
   source = 200;
   et.dispatchEvent(new Event("update"));
 
-  expect(a()).toEqual(100);
-  expect(received).toEqual(13);
-  expect(c()).toEqual(100);
-  expect(cleared).toEqual(2);
+  equal(a(), 100);
+  equal(received, 13);
+  equal(c(), 100);
+  equal(cleared, 2);
 });
 
 test("prevent write during read", () => {
   let os = ObservableScope();
-
   let a = os.observable(0);
   let b = os.computed(() => a() * 2);
-  expect(() => os.computed(() => a(123))).toThrow(/prohibited/);
-  expect(() => os.watch(() => a(123))).toThrow(/prohibited/);
-  expect(() => os.watch(() => b(123))).toThrow(/prohibited/);
+  throws(() => os.computed(() => a(123)), { message: /prohibited/ });
+  throws(() => os.watch(() => a(123)), { message: /prohibited/ });
+  throws(() => os.watch(() => b(123)), { message: /prohibited/ });
 });

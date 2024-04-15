@@ -1,4 +1,5 @@
-import { test, expect } from "vitest";
+import { test } from "node:test";
+import { deepEqual } from "node:assert/strict";
 import { brush } from "./interaction.js";
 
 test("brush", () => {
@@ -8,14 +9,14 @@ test("brush", () => {
     [200, 100],
   ]);
 
-  expect(ctl.get()).toEqual(undefined);
+  deepEqual(ctl.get(), undefined);
 
   ctl.down(10, 10);
   ctl.move(40, 40);
   ctl.move(60, 30);
   ctl.up();
 
-  expect(ctl.get()).toEqual([
+  deepEqual(ctl.get(), [
     [10, 10],
     [60, 30],
   ]);
@@ -24,7 +25,7 @@ test("brush", () => {
   ctl.move(5, 5);
   ctl.up();
 
-  expect(ctl.get()).toEqual([
+  deepEqual(ctl.get(), [
     [5, 5],
     [70, 80],
   ]);
@@ -33,7 +34,7 @@ test("brush", () => {
   ctl.move(25, 25);
   ctl.up();
 
-  expect(ctl.get()).toEqual([
+  deepEqual(ctl.get(), [
     [10, 10],
     [75, 85],
   ]);

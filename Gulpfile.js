@@ -5,6 +5,7 @@ import { format } from "prettier";
 import { pipeline } from "node:stream/promises";
 import { basename, relative } from "node:path";
 import { readFileSync } from "node:fs";
+import { execSync } from "node:child_process";
 
 import { rollup } from "rollup";
 
@@ -12,23 +13,21 @@ import yargs from "yargs";
 import { Parcel } from "@parcel/core";
 
 import { ESLint } from "eslint";
-import { createVitest } from "vitest/node";
 
 let isCI = process.env.CI != null;
 
+export let test = series(unit, functional);
+
 export let ci = parallel(test, lint);
 
-export async function test() {
-  let { watch } = yargs(process.argv).boolean("watch").parse();
-  let vitest = await createVitest("test", { watch }, undefined, {
-    coverage: {
-      enabled: true,
-      provider: "istanbul",
-      include: ["modules"],
-    },
-  });
-  await vitest.start();
-  await vitest.close();
+export async function unit() {
+  // Node.js test runner API doesn't allow enabling test coverage
+  execSync("node --test --experimental-test-coverage", { stdio: "inherit" });
+}
+
+export async function functional() {
+  // Playwright does not have API
+  execSync("npx playwright test", { stdio: "inherit" });
 }
 
 export async function lint() {

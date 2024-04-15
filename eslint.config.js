@@ -17,7 +17,7 @@ export default [
       },
     },
     linterOptions: {
-      noInlineConfig: true,
+      noInlineConfig: false,
     },
   },
 ];
