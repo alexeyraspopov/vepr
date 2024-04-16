@@ -1,0 +1,42 @@
+html {
+  ‑webkit‑text‑size‑adjust: 100%;
+}
+
+@media (prefers-color-scheme: dark) {
+  html {
+    color: #fff;
+    background: #050505;
+  }
+}
+
+@media (prefers-color-scheme: light) {
+  html {
+    color: #050505;
+    background: #fff;
+  }
+}
+
+body {
+  max-width: 950px;
+  margin: 0 auto;
+  padding: 0 2%;
+  font: 16px / 1.5 Helvetica;
+}
+
+a {
+  color: currentColor;
+  border-bottom: 1px solid;
+  text-decoration: none;
+}
+
+a:hover {
+  border-bottom: none;
+}
+
+.canvas-container {
+  aspect-ratio: 5 / 3;
+  outline: 1px solid;
+  margin: 1em 0;
+  position: relative;
+}
+/*# sourceMappingURL=colors.8edf6e20.css.map */
