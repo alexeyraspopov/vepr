@@ -32,10 +32,10 @@ let test = base.extend({
 
 test("interpolation with ideal timer condition", async ({ execute, advance }) => {
   let snapshots = await execute(async () => {
-    let { requestMotion } = await import("./motion.js");
+    let { motion } = await import("./motion.js");
     let snapshots = [];
     let ctl = new AbortController();
-    requestMotion([0], [10], ctl.signal, ([x]) => snapshots.push(x));
+    motion([0], [10], ctl.signal, ([x]) => snapshots.push(x));
     return snapshots;
   });
 
@@ -50,10 +50,10 @@ test("interpolation with ideal timer condition", async ({ execute, advance }) =>
 
 test("eventual interpolation completeness", async ({ execute, advance }) => {
   let snapshots = await execute(async () => {
-    let { requestMotion } = await import("./motion.js");
+    let { motion } = await import("./motion.js");
     let snapshots = [];
     let ctl = new AbortController();
-    requestMotion([0], [10], ctl.signal, ([x]) => snapshots.push(x));
+    motion([0], [10], ctl.signal, ([x]) => snapshots.push(x));
     return snapshots;
   });
 
@@ -65,10 +65,10 @@ test("eventual interpolation completeness", async ({ execute, advance }) => {
 
 test("interpolation with inconsistent timer condition", async ({ execute, advance }) => {
   let snapshots = await execute(async () => {
-    let { requestMotion } = await import("./motion.js");
+    let { motion } = await import("./motion.js");
     let snapshots = [];
     let ctl = new AbortController();
-    requestMotion([0], [10], ctl.signal, ([x]) => snapshots.push(x));
+    motion([0], [10], ctl.signal, ([x]) => snapshots.push(x));
     return snapshots;
   });
 
@@ -99,9 +99,9 @@ test("explicit motion cancellation", async ({ execute, advance }) => {
   let ctl = await execute(() => new AbortController());
 
   let snapshots = await execute(async (ctl) => {
-    let { requestMotion } = await import("./motion.js");
+    let { motion } = await import("./motion.js");
     let snapshots = [];
-    requestMotion([-10], [-100], ctl.signal, ([x]) => snapshots.push(x));
+    motion([-10], [-100], ctl.signal, ([x]) => snapshots.push(x));
     return snapshots;
   }, ctl);
 

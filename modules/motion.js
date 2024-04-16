@@ -9,7 +9,7 @@ const MAX_SKIP_FRAME = 10;
  * @param {AbortSignal} signal
  * @param {(values: T) => void} callback
  */
-export function requestMotion(start, destination, signal, callback) {
+export function motion(start, destination, signal, callback) {
   let current = Float64Array.from(start);
   let velocity = new Float64Array(current.length);
   let interpolated = current.slice();

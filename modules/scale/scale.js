@@ -6,8 +6,8 @@ const PERC = /^[\d.]+%$/;
  * Implements one dimensional grid-like layout binning scale.
  *
  * @example
- *   let columns = Track(["20u", "1f", "50u"], containerWidth);
- *   let rows = Track(["15u", "20u", "1f", "20u"], containerHeight);
+ *   let columns = track(["20u", "1f", "50u"], containerWidth);
+ *   let rows = track(["15u", "20u", "1f", "20u"], containerHeight);
  *   let [x0, x1] = columns(1);
  *   let scaleX = scaleLinear(domainX, [x0, x1]);
  *
@@ -18,7 +18,7 @@ const PERC = /^[\d.]+%$/;
  * @param {number} [u=1] Default is `1`
  * @returns {(start: number, span?: number) => [number, number]}
  */
-export function Track(template, length, padding = 0, gap = 0, u = 1) {
+export function track(template, length, padding = 0, gap = 0, u = 1) {
   let n = template.length;
   let cLength = length - 2 * padding;
   let nUnits = 0;
@@ -40,7 +40,6 @@ export function Track(template, length, padding = 0, gap = 0, u = 1) {
     else if (PERC.test(def)) return parseFloat(def) * (cLength / 100);
     else throw new Error(`Unknown unit ${def}`);
   });
-  let sum = (a, b) => a + b;
   return (start, span = 1) => {
     if (start < 0 || span < 0) throw new Error("invariant");
     let offset = reduce(bins, 0, start, sum, 0) + padding + start * gap;
@@ -54,4 +53,8 @@ function reduce(array, offset, limit, reducer, result) {
     result = reducer(result, array[index]);
   }
   return result;
+}
+
+function sum(a, b) {
+  return a + b;
 }

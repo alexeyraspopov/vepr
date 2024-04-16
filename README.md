@@ -3,7 +3,8 @@
 <p>Vepr is a JavaScript library for exploratory data visualization.</p>
 </div>
 
-Vepr implements special protocol that allows declaring complex data
+Vepr is all-in-one toolkit for building exploratory data visualization
+experience. Vepr implements protocol that allows declaring complex data
 visualizations in a scheme with small footprint and being able to transfer the
 visualization to different environment (e.g. server → browser, web worker → main
 thread).

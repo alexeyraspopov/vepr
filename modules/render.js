@@ -1,24 +1,24 @@
 import { ObservableScope } from "./observable.js";
-import { Track } from "./scale/scale.js";
+
+import { track } from "./scale/scale.js";
 import { markStart, markFinish } from "./profiling.js";
 import { renderAxis } from "./legend/axis.js";
 import * as shape from "./shape.js";
-
-let renderFn = new Map([["axis", renderAxis]]);
+import { interpolateLinear } from "./scale/function.js";
 
 /**
- * Render a visualization blueprint using Canvas
+ * Create canvas rendering controller
  *
- * @param {Blueprint} blueprint A thing to render
  * @param {HTMLElement} container HTML element to render to
+ * @param {number} [layers=1] Default is `1`
  */
-export function render(blueprint, container) {
+export function stage(container, layers = 1) {
   let os = ObservableScope();
-  let bp = os.observable(blueprint);
   let canvas = createCanvas(container);
   let size = observeElementSize(os, container);
   let style = observeContainerStyle(os, container);
   let devicePixelRatio = observeDevicePixelRatio(os);
+  let pointer = observePointer(os, container);
 
   // Real canvas element size in dom is different from the drawing canvas available
   // The drawing canvas needs to be readjusted accordingly to the size available,
@@ -34,44 +34,62 @@ export function render(blueprint, container) {
     return acquireCanvasContext(canvas, width, height, ratio);
   });
 
-  os.watch(() => {
-    // HACK canvas only picks up currentColor and current font settings if defined via style attribute
-    // re-render canvas if the color changes, so dark/light theme switch is supported
-    Object.assign(canvas.style, style());
+  function dispose() {
+    releaseCanvas(canvas);
+    canvas.remove();
+    canvas = null;
+    os.dispose();
+  }
 
-    let ctx = context();
-    let { width, height } = size();
+  return { os, canvas, size, style, scale, context, pointer, dispose };
+}
 
-    let trackX = Track(["20u", "1f"], width, 20, 4);
-    let trackY = Track(["1f", "25u"], height, 10, 4);
+/**
+ * Render a visualization blueprint using Canvas
+ *
+ * @deprecated This will be moved to the user space soon
+ * @param {Blueprint} blueprint A thing to render
+ * @param {HTMLElement} container HTML element to render to
+ */
+export function render(blueprint, container) {
+  let cnvs = stage(container);
+  let bp = cnvs.os.observable(blueprint);
 
-    let { layout } = bp();
-    function interpolate([x0, x1]) {
-      let k = x1 - x0;
-      return (t) => x0 + k * t;
-    }
+  let blocks = cnvs.os.computed(() => {
+    let { width, height } = cnvs.size();
 
-    let areas = {
+    let trackX = track(["20u", "1f"], width, 20, 4);
+    let trackY = track(["1f", "30u"], height, 10, 4);
+
+    return {
       main: {
-        x: interpolate(trackX(1, 1)),
-        y: interpolate(trackY(0, 1).reverse()),
+        x: interpolateLinear(...trackX(1, 1)),
+        y: interpolateLinear(...trackY(0, 1).reverse()),
       },
       haxis: {
-        x: interpolate(trackX(1, 1)),
-        y: interpolate(trackY(1, 1).reverse()),
+        x: interpolateLinear(...trackX(1, 1)),
+        y: interpolateLinear(...trackY(1, 1).reverse()),
       },
       vaxis: {
-        x: interpolate(trackX(0, 1)),
-        y: interpolate(trackY(0, 1).reverse()),
+        x: interpolateLinear(...trackX(0, 1)),
+        y: interpolateLinear(...trackY(0, 1).reverse()),
       },
     };
+  });
 
-    let ctl = new AbortController();
+  cnvs.os.watch(() => {
+    // HACK canvas only picks up currentColor and current font settings if defined via style attribute
+    // re-render canvas if the color changes, so dark/light theme switch is supported
+    Object.assign(cnvs.canvas.style, cnvs.style());
 
+    let { width, height } = cnvs.size();
+    let ctx = cnvs.context();
+    let { layout } = bp();
+    let areas = blocks();
+    let renderFn = new Map([["axis", renderAxis]]);
+    let actl = new AbortController();
     markStart("render");
-
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-
+    ctx.clearRect(0, 0, width, height);
     for (let area in layout) {
       let scales = areas[area];
       let layers = layout[area];
@@ -88,25 +106,11 @@ export function render(blueprint, container) {
         }
       }
     }
-
     markFinish("render");
-
-    return () => ctl.abort();
+    return () => actl.abort();
   });
 
-  /** @param {Blueprint} blueprint */
-  function update(blueprint) {
-    bp(blueprint);
-  }
-
-  function remove() {
-    releaseCanvas(canvas);
-    canvas.remove();
-    canvas = null;
-    os.dispose();
-  }
-
-  return { update, remove };
+  return { update: bp, remove: cnvs.dispose };
 }
 
 /**
@@ -173,6 +177,64 @@ function observeContainerStyle(os, target) {
 }
 
 /**
+ * @param {ObservableScope} os
+ * @param {HTMLElement} target
+ */
+function observePointer(os, target) {
+  let state = { down: false, over: false, x: 0, y: 0 };
+  /** @param {PointerEvent} event */
+  function handleEvent(event) {
+    switch (event.type) {
+      case "pointerdown":
+        state.down = true;
+        break;
+      case "pointerup":
+        state.down = false;
+        break;
+      case "pointerenter":
+        state.over = true;
+        break;
+      case "pointerleave":
+        state.over = false;
+        break;
+      case "pointermove":
+        state.x = event.offsetX;
+        state.y = event.offsetY;
+        break;
+    }
+  }
+  return os.observe(
+    () => state,
+    (cb) => {
+      /** @param {PointerEvent} event */
+      function handle(event) {
+        if (event.name === "pointerdown") {
+          target.setPointerCapture(event.pointerId);
+        } else if (event.name === "pointerup") {
+          target.releasePointerCapture(event.pointerId);
+        }
+        handleEvent(event);
+        cb();
+      }
+
+      target.addEventListener("pointermove", handle);
+      target.addEventListener("pointerdown", handle);
+      target.addEventListener("pointerup", handle);
+      target.addEventListener("pointerenter", handle);
+      target.addEventListener("pointerleave", handle);
+      return () => {
+        target.removeEventListener("pointermove", handle);
+        target.removeEventListener("pointerdown", handle);
+        target.removeEventListener("pointerup", handle);
+        target.removeEventListener("pointerover", handle);
+        target.removeEventListener("pointerleave", handle);
+      };
+    },
+    () => false,
+  );
+}
+
+/**
  * Rendering area of canvas can be different from its visual element's size.
  * This function computes proper rendering area size based on devicePixelRatio
  * and optional scaling factor that can enhance image sharpness (though by
@@ -209,7 +271,9 @@ function createCanvas(container) {
   let canvas = document.createElement("canvas");
   canvas.style.display = "block";
   canvas.style.position = "absolute";
-  canvas.style.top = 0;
+  canvas.style.inset = "0 0 0 0";
+  canvas.style.background = "transparent";
+  canvas.style.border = "none";
   container.append(canvas);
   return canvas;
 }
